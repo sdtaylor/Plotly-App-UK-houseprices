@@ -26,6 +26,11 @@ from utils import (
     get_regional_geo_data,
     get_regional_geo_sector,
     get_schools_data,
+    
+    get_all_data_for_region_and_var,
+    get_all_data_for_timeperiod_and_var,
+    get_available_variables,
+    get_all_region_info
 )
 
 warnings.filterwarnings("ignore")
@@ -45,9 +50,13 @@ regions = [
     "Midlands",
     "North England",
     "Wales",
+    "Counties",
 ]
 
 colors = {"background": "#1F2630", "text": "#7FDBFF"}
+
+geo_levels = ['country','metro']
+
 
 NOTES = """
     **Notes:**
@@ -96,6 +105,13 @@ initial_geo_sector = [regional_geo_sector[initial_region][initial_sector]]
 empty_series = pd.DataFrame(np.full(len(cfg["Years"]), np.nan), index=cfg["Years"])
 empty_series.rename(columns={0: ""}, inplace=True)
 
+
+initial_variable = 'total_homes_sold'
+
+variable_list = get_available_variables()
+region_id_lut = get_all_region_info()
+
+all_time_periods = get_all_data_for_region_and_var(region_id=2272, variable=initial_variable)
 
 """ ----------------------------------------------------------------------------
  Dash App
@@ -191,6 +207,107 @@ app.layout = html.Div(
                 html.Div(
                     [
                         dcc.Dropdown(
+                            id="variable",
+                            options=[{"label": v, "value": v} for v in variable_list],
+                            value=initial_variable,
+                            clearable=False,
+                            style={"color": "black"},
+                        )
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "padding": "0px 5px 10px 15px",
+                        "width": "10%",
+                    },
+                    className="one columns",
+                ),
+                
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="region_id",
+                            options=[
+                                {"label": r_lab, "value": r_id}
+                                for r_id, r_lab in region_id_lut['counties'].items()
+                            ],
+                            value=[],
+                            clearable=True,
+                            multi=True,
+                            style={"color": "black"},
+                        ),
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "padding": "0px 5px 10px 0px",
+                        "width": "20%",
+                    },
+                    className="seven columns",
+                ),
+                
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="duration",
+                            options=[{"label": v, "value": v} for v in ['1 weeks']],
+                            value='1 weeks',
+                            clearable=False,
+                            style={"color": "black"},
+                        )
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "padding": "0px 5px 10px 15px",
+                        "width": "10%",
+                    },
+                    className="one columns",
+                ),
+                
+                html.Div(
+                    [
+                        dbc.RadioItems(
+                            id="geo-type",
+                            options=[
+                                {'label':'Counties', 'value':'counties'},
+                                {'label':'Metro Areas', 'value':'metros'},
+                            ],
+                            value="counties",
+                            inline=True,
+                        )
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "textAlign": "center",
+                        "padding": "5px 0px 10px 10px",
+                        "width": "10%",
+                    },
+                    className="two columns",
+                ),
+                
+                
+                html.Div(
+                    [
+                        dcc.Dropdown(
+                            id="period_ending",
+                            options=[
+                                {"label": i, "value": i}
+                                for i in ['2024-01-21']
+                            ],
+                            value="Counties",
+                            clearable=False,
+                            style={"color": "black"},
+                        )
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "padding": "0px 5px 10px 15px",
+                        "width": "10%",
+                    },
+                    className="one columns",
+                ),
+                 
+                html.Div(
+                    [
+                        dcc.Dropdown(
                             id="region",
                             options=[{"label": r, "value": r} for r in regions],
                             value=initial_region,
@@ -241,7 +358,7 @@ app.layout = html.Div(
                     style={
                         "display": "inline-block",
                         "padding": "0px 5px 10px 0px",
-                        "width": "40%",
+                        "width": "20%",
                     },
                     className="seven columns",
                 ),
@@ -409,13 +526,17 @@ app.layout = html.Div(
 @app.callback(
     Output("choropleth-title", "children"),
     [
-        Input("region", "value"),
-        Input("year", "value"),
-        Input("graph-type", "value"),
-        Input("school-checklist", "value"),
+        Input('variable', 'value'),
+        Input("duration", "value"),
+        Input("geo-type", "value"),
+        #Input("graph-type", "value"),
+        #Input("school-checklist", "value"),
     ],
 )
-def update_map_title(region, year, gtype, school):
+def update_map_title(variable, duration, geo_type):
+    return f"{variable} for {geo_type} and {duration} smoothing window"
+    
+    
     if len(school) > 0:
         return "Top 500 schools (Postcode selection disabled)"
     elif gtype == "Price":
@@ -433,14 +554,18 @@ def update_map_title(region, year, gtype, school):
             )
 
 
-# Update postcode dropdown options with region selection
+# Update region dropdown options with either county or metro selections
 @app.callback(
-    Output("postcode", "options"), [Input("region", "value"), Input("year", "value")]
+    Output("region_id", "options"), 
+    [
+     Input("geo-type", "value"), 
+     #Input("year", "value")
+     ]
 )
-def update_region_postcode(region, year):
+def update_region_entries(geo_type):
     return [
-        {"label": s, "value": s}
-        for s in regional_price_data[year][region].Sector.values
+        {"label": r_lab, "value": r_id}
+        for r_id, r_lab in region_id_lut[geo_type].items()
     ]
 
 
@@ -448,6 +573,7 @@ def update_region_postcode(region, year):
 @app.callback(
     Output("choropleth", "figure"),
     [
+        Input('variable','value'),
         Input("year", "value"),
         Input("region", "value"),
         Input("graph-type", "value"),
@@ -455,7 +581,46 @@ def update_region_postcode(region, year):
         Input("school-checklist", "value"),
     ],
 )  # @cache.memoize(timeout=cfg['timeout'])
-def update_Choropleth(year, region, gtype, sectors, school):
+def update_Choropleth(variable, year, region, gtype, sectors, school):
+    logging.info('update_choropleth: setting things up')
+    #variable = initial_variable
+    logging.info('update_choropleth: get data')
+    df = get_all_data_for_timeperiod_and_var(variable)
+    #df = get_all_data_for_region_and_var(region_id=2772, variable=variable)
+    # counties only
+    logging.info('update_choropleth: massage data')
+    df = df[df['region_id'].isin(region_id_lut['counties'])]
+    df['Price'] = df[variable]
+    
+    df['Sector'] = df['region_id'].map(lambda i: region_id_lut['counties'][i])
+    
+    def format_hover_text(i):
+        outline = '{name}\n{variable}: {value}'
+        return outline.format(
+            name = i.Sector,
+            variable = variable,
+            value = i[variable]
+            )
+    df['text'] = df.apply(format_hover_text, axis=1)
+    
+    logging.info('update_choropleth: getting figure')
+    
+    
+    fig = get_figure(
+        df = df,
+        #geo_data = cfg['assets dir'].joinpath(regional_geo_data_paths['Counties']).as_posix(),
+        geo_data = app.get_asset_url(regional_geo_data_paths[region]),
+        region='Counties',
+        gtype=gtype,
+        year=None,
+        geo_sectors=None,
+        school=[],
+        schools_top_500=None,
+    )
+    
+    logging.info('update_choropleth: success?')
+    return fig
+    
     # Graph type selection------------------------------#
     if gtype in ["Price", "Volume"]:
         df = regional_price_data[year][region]
@@ -492,13 +657,16 @@ def update_Choropleth(year, region, gtype, sectors, school):
     return fig
 
 
-# Update price-time-series with postcode updates and graph-type
+# # Update price-time-series with postcode updates and graph-type
 @app.callback(
     Output("price-time-series", "figure"),
-    [Input("postcode", "value"), Input("property-type-checklist", "value")],
+    [
+     Input("postcode", "value"), 
+     Input("property-type-checklist", "value")
+     ],
 )
 @cache.memoize(timeout=cfg["timeout"])
-def update_price_timeseries(sectors, ptypes):
+def update_price_timeseries(region_ids, ptypes):
 
     if len(sectors) == 0:
         return price_ts(empty_series, "Please select postcodes", colors)
@@ -528,45 +696,45 @@ def update_price_timeseries(sectors, ptypes):
 
 # ----------------------------------------------------#
 
-# Update postcode dropdown values with clickData, selectedData and region
-@app.callback(
-    Output("postcode", "value"),
-    [
-        Input("choropleth", "clickData"),
-        Input("choropleth", "selectedData"),
-        Input("region", "value"),
-        Input("school-checklist", "value"),
-        State("postcode", "value"),
-        State("choropleth", "clickData"),
-    ],
-)
-def update_postcode_dropdown(
-    clickData, selectedData, region, school, postcodes, clickData_state
-):
+# # Update postcode dropdown values with clickData, selectedData and region
+# @app.callback(
+#     Output("postcode", "value"),
+#     [
+#         Input("choropleth", "clickData"),
+#         Input("choropleth", "selectedData"),
+#         Input("region", "value"),
+#         Input("school-checklist", "value"),
+#         State("postcode", "value"),
+#         State("choropleth", "clickData"),
+#     ],
+# )
+# def update_postcode_dropdown(
+#     clickData, selectedData, region, school, postcodes, clickData_state
+# ):
 
-    # Logic for initialisation or when Schoold sre selected
-    if dash.callback_context.triggered[0]["value"] is None:
-        return postcodes
+#     # Logic for initialisation or when Schoold sre selected
+#     if dash.callback_context.triggered[0]["value"] is None:
+#         return postcodes
 
-    changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]
+#     changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]
 
-    if len(school) > 0 or "school" in changed_id:
-        clickData_state = None
-        return []
+#     if len(school) > 0 or "school" in changed_id:
+#         clickData_state = None
+#         return []
 
-    # --------------------------------------------#
+#     # --------------------------------------------#
 
-    if "region" in changed_id:
-        postcodes = []
-    elif "selectedData" in changed_id:
-        postcodes = [D["location"] for D in selectedData["points"][: cfg["topN"]]]
-    elif clickData is not None and "location" in clickData["points"][0]:
-        sector = clickData["points"][0]["location"]
-        if sector in postcodes:
-            postcodes.remove(sector)
-        elif len(postcodes) < cfg["topN"]:
-            postcodes.append(sector)
-    return postcodes
+#     if "region" in changed_id:
+#         postcodes = []
+#     elif "selectedData" in changed_id:
+#         postcodes = [D["location"] for D in selectedData["points"][: cfg["topN"]]]
+#     elif clickData is not None and "location" in clickData["points"][0]:
+#         sector = clickData["points"][0]["location"]
+#         if sector in postcodes:
+#             postcodes.remove(sector)
+#         elif len(postcodes) < cfg["topN"]:
+#             postcodes.append(sector)
+#     return postcodes
 
 
 # ----------------------------------------------------#
@@ -587,7 +755,7 @@ if __name__ == "__main__":
 
     # If running on AWS/Pythonanywhere production
     else:
-        app.run_server(port=8050, host="0.0.0.0")
+        app.run_server(port=8050, host="0.0.0.0", debug=True)
 
 """ ----------------------------------------------------------------------------
 Terminal cmd to run:

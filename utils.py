@@ -4,6 +4,8 @@ import pandas as pd
 import logging
 from copy import deepcopy
 
+import sqlite3
+
 from config import config as cfg
 
 
@@ -65,3 +67,82 @@ def get_schools_data():
     schools_top_500 = pd.read_csv(os.path.join(cfg['app_data_dir'], f'schools_top_500.csv'))
     schools_top_500['Best Rank'] *= -1 #reverse the rankings solely for display purpose
     return schools_top_500
+
+
+# local_db = duckdb.connect()
+
+# weekly_dir_parquet_glob = "{}/**/*.parquet".format(cfg['data_dirs']['weekly_data_by_region'])
+
+# q = f"""
+# CREATE VIEW weekly_data_by_region AS
+# SELECT * from read_parquet('{weekly_dir_parquet_glob}');
+# """
+# local_db.execute(q)
+
+def get_all_data_for_region_and_var(region_id, variable, duration='1 weeks'):
+    q = f"""
+    SELECT period_begin, period_end, duration, {variable}  
+    FROM weekly_data_raw 
+    WHERE region_id = {region_id}
+    AND duration = '{duration}';
+    """
+    with sqlite3.connect(cfg['data_db']) as con:
+        df = pd.read_sql(q, con)
+    
+    return df
+
+LAST_PERIOD = '2024-01-21'
+
+#TODO: make a table optimized for this. make last
+def get_all_data_for_timeperiod_and_var(variable, period_end=LAST_PERIOD, duration='1 weeks'):
+    """This one is for map data"""
+    q = f"""
+    SELECT region_id, period_end, duration, {variable}  
+    FROM weekly_data_raw 
+    WHERE period_end = '{period_end}'
+    AND duration = '{duration}';
+    """
+    with sqlite3.connect(cfg['data_db']) as con:
+        df = pd.read_sql(q, con)
+    
+    return df
+
+#TODO: make this a mapping with pretty var names
+def get_available_variables():
+    table_cols_to_exclude = ['index','region_type_id','region_name','region_type',
+                             'period_begin','period_end','duration','region_id',
+                             'last_updated',
+                             ]
+    
+    with sqlite3.connect(cfg['data_db']) as con:
+        cols = pd.read_sql('select * from weekly_data_raw limit 1', con).columns
+    
+    return [c for c in cols if c not in table_cols_to_exclude]
+    
+    #TODO: drop this if never using duckdb   
+    return ( 
+        local_db
+        .execute('describe weekly_data_by_region')
+        .df()
+        .query("~column_name.isin(@table_cols_to_exclude)")
+        .column_name
+        .tolist()
+        )
+
+#TODO: optimize to another table
+def get_all_region_info():
+    region_info = {}
+
+    q = """
+    SELECT distinct region_type, region_id, region_name
+    FROM weekly_data_raw
+    """
+    with sqlite3.connect(cfg['data_db']) as con:
+        all_region_info = pd.read_sql(q, con)
+    
+    # Make a mapping of {region_id:region_name,...}
+    region_info['counties'] = all_region_info.query("region_type=='county'").set_index('region_id').to_dict()['region_name']
+    region_info['metros'] = all_region_info.query("region_type=='metro'").set_index('region_id').to_dict()['region_name']
+
+    return region_info
+

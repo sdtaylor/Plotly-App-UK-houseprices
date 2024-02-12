@@ -1,9 +1,10 @@
 import os
+from pathlib import Path
 
-appDataPath = "/home/ivanlai/apps-UK_houseprice/appData"
-assetsPath  = "/home/ivanlai/apps-UK_houseprice/assets"
+appDataPath = Path("/home/shawn/projects/Plotly-App-UK-houseprices/appData")
+assetsPath  = Path("/home/shawn/projects/Plotly-App-UK-houseprices/assets")
 
-if os.path.isdir(appDataPath):
+if appDataPath.exists():
     app_data_dir = appDataPath
     assets_dir = assetsPath
     cache_dir = "cache"
@@ -27,6 +28,13 @@ config = {
     "timeout": 5 * 60,  # Used in flask_caching
     "cache threshold": 10_000,  # corresponds to ~350MB max
 
+    'data_dirs' : {
+        'weekly_data_by_region' : appDataPath.joinpath('redfin_weekly_data_by_region'),
+        'weekly_data_by_date' : appDataPath.joinpath('redfin_weekly_data_by_date'),
+        },
+    
+    'data_db': appDataPath.joinpath('data.sqlite'),
+
     "regions_lookup": {
         'North East'      : 'North England',
         'North West'      : 'North England',
@@ -37,7 +45,8 @@ config = {
         'South West'      : 'South West',
         'Wales'           : 'Wales',
         'Scotland'        : 'Scotland',
-        'Northern Ireland': 'Northern Ireland'
+        'Northern Ireland': 'Northern Ireland',
+        'Counties'        : 'Counties',
     },
 
     "plotly_config":{
@@ -47,7 +56,8 @@ config = {
          'South West':     {'centre': [51.1, -3.7], 'maxp': 99, 'zoom': 6.9},
          'South East':     {'centre': [51.5, -0.1], 'maxp': 90, 'zoom': 7.3},
          'Greater London': {'centre': [51.5, -0.1], 'maxp': 80, 'zoom': 8.9},
-    },
+         'Counties':       {'centre': [40.1, -100], 'maxp': 99, 'zoom': 4.0},
+         },
 
     "logging format": "pid %(process)5s [%(asctime)s] %(levelname)8s: %(message)s"
 }
