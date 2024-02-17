@@ -46,7 +46,7 @@ config = {
         'Wales'           : 'Wales',
         'Scotland'        : 'Scotland',
         'Northern Ireland': 'Northern Ireland',
-        'Counties'        : 'Counties',
+        'counties'        : 'counties',
     },
 
     "plotly_config":{
@@ -56,7 +56,7 @@ config = {
          'South West':     {'centre': [51.1, -3.7], 'maxp': 99, 'zoom': 6.9},
          'South East':     {'centre': [51.5, -0.1], 'maxp': 90, 'zoom': 7.3},
          'Greater London': {'centre': [51.5, -0.1], 'maxp': 80, 'zoom': 8.9},
-         'Counties':       {'centre': [40.1, -100], 'maxp': 99, 'zoom': 4.0},
+         'counties':       {'centre': [40.1, -100], 'maxp': 99, 'zoom': 4.0},
          },
 
     "logging format": "pid %(process)5s [%(asctime)s] %(levelname)8s: %(message)s"

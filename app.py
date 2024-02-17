@@ -13,6 +13,8 @@ import pandas as pd
 from dash.dependencies import Input, Output, State
 from flask_caching import Cache
 
+import plotly.express as px
+
 from config import config as cfg
 from figures_utils import (
     get_average_price_by_year,
@@ -111,7 +113,8 @@ initial_variable = 'total_homes_sold'
 variable_list = get_available_variables()
 region_id_lut = get_all_region_info()
 
-all_time_periods = get_all_data_for_region_and_var(region_id=2272, variable=initial_variable)
+
+all_time_periods = get_all_data_for_region_and_var(region_ids=[2272], variable=initial_variable)
 
 """ ----------------------------------------------------------------------------
  Dash App
@@ -574,25 +577,28 @@ def update_region_entries(geo_type):
     Output("choropleth", "figure"),
     [
         Input('variable','value'),
-        Input("year", "value"),
-        Input("region", "value"),
-        Input("graph-type", "value"),
-        Input("postcode", "value"),
-        Input("school-checklist", "value"),
+        Input("geo-type", "value"), 
+        Input("duration", "value"),
+        Input("region_id", "value"),
+             
+      #  Input("year", "value"),
+      #  Input("region", "value"),
+      #  Input("graph-type", "value"),
+      #  Input("postcode", "value"),
+      #  Input("school-checklist", "value"),
     ],
 )  # @cache.memoize(timeout=cfg['timeout'])
-def update_Choropleth(variable, year, region, gtype, sectors, school):
+def update_Choropleth(variable, geo_type, duration, region_ids):
     logging.info('update_choropleth: setting things up')
     #variable = initial_variable
-    logging.info('update_choropleth: get data')
     df = get_all_data_for_timeperiod_and_var(variable)
     #df = get_all_data_for_region_and_var(region_id=2772, variable=variable)
     # counties only
-    logging.info('update_choropleth: massage data')
-    df = df[df['region_id'].isin(region_id_lut['counties'])]
+
+    df = df[df['region_id'].isin(region_id_lut[geo_type])]
     df['Price'] = df[variable]
     
-    df['Sector'] = df['region_id'].map(lambda i: region_id_lut['counties'][i])
+    df['Sector'] = df['region_id'].map(lambda i: region_id_lut[geo_type][i])
     
     def format_hover_text(i):
         outline = '{name}\n{variable}: {value}'
@@ -603,22 +609,19 @@ def update_Choropleth(variable, year, region, gtype, sectors, school):
             )
     df['text'] = df.apply(format_hover_text, axis=1)
     
-    logging.info('update_choropleth: getting figure')
-    
     
     fig = get_figure(
         df = df,
         #geo_data = cfg['assets dir'].joinpath(regional_geo_data_paths['Counties']).as_posix(),
-        geo_data = app.get_asset_url(regional_geo_data_paths[region]),
-        region='Counties',
-        gtype=gtype,
+        geo_data = app.get_asset_url(regional_geo_data_paths[geo_type]),
+        region=geo_type,
+        gtype='Price', #TODO, get rid of this. have a single val column in all data
         year=None,
         geo_sectors=None,
         school=[],
         schools_top_500=None,
     )
     
-    logging.info('update_choropleth: success?')
     return fig
     
     # Graph type selection------------------------------#
@@ -628,6 +631,7 @@ def update_Choropleth(variable, year, region, gtype, sectors, school):
         df = regional_percentage_delta_data[year][region]
 
     # For high-lighting mechanism ----------------------#
+    #---------probably need to use below to highlight on map those values cliked in bar------------------
     changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]
     geo_sectors = dict()
 
@@ -661,22 +665,47 @@ def update_Choropleth(variable, year, region, gtype, sectors, school):
 @app.callback(
     Output("price-time-series", "figure"),
     [
-     Input("postcode", "value"), 
-     Input("property-type-checklist", "value")
+     Input("region_id", "value"),
+     Input('variable','value'),
+    # Input("postcode", "value"), 
+    # Input("property-type-checklist", "value")
      ],
 )
 @cache.memoize(timeout=cfg["timeout"])
-def update_price_timeseries(region_ids, ptypes):
+def update_price_timeseries(region_ids, variable):
 
-    if len(sectors) == 0:
-        return price_ts(empty_series, "Please select postcodes", colors)
+    if len(region_ids) == 0:
+        return price_ts(empty_series, "Please select regions", colors)
+    elif len(region_ids) > 1:
+        logging.info('>1 region selected. only plotting the 1st in the timeseries')
 
-    if len(ptypes) == 0:
+    if len(variable) == 0:
         return price_ts(
-            empty_series, "Please select at least one property type", colors
+            empty_series, "Please select a variable", colors
         )
 
     # --------------------------------------------------#
+    df = get_all_data_for_region_and_var(region_ids = region_ids, variable=variable)
+    df['period_end'] = pd.to_datetime(df['period_end'])
+    
+    df = df.sort_values('period_end')
+    
+    title = f'{variable}'
+    fig = px.scatter(df, x='period_end', y=variable,
+                     title=title)
+    fig.update_traces(mode='lines+markers')
+    fig.update_xaxes(showgrid=False)
+    fig.update_layout(margin={'l': 20, 'b': 30, 'r': 10, 't': 60},
+                      plot_bgcolor=colors['background'],
+                      paper_bgcolor=colors['background'],
+                      autosize=True,
+                      font_color=colors['text'])
+    
+    return fig
+    
+    
+    
+    
     df = price_volume_df.iloc[
         np.isin(price_volume_df.index.get_level_values("Property Type"), ptypes),
         np.isin(price_volume_df.columns.get_level_values("Sector"), sectors),

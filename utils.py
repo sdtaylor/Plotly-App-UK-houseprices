@@ -79,11 +79,12 @@ def get_schools_data():
 # """
 # local_db.execute(q)
 
-def get_all_data_for_region_and_var(region_id, variable, duration='1 weeks'):
+def get_all_data_for_region_and_var(region_ids, variable, duration='1 weeks'):
+    region_in_str = ','.join([str(i) for i in region_ids])
     q = f"""
-    SELECT period_begin, period_end, duration, {variable}  
+    SELECT region_id, period_begin, period_end, duration, {variable}  
     FROM weekly_data_raw 
-    WHERE region_id = {region_id}
+    WHERE region_id in ({region_in_str})
     AND duration = '{duration}';
     """
     with sqlite3.connect(cfg['data_db']) as con:
