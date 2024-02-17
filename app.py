@@ -29,6 +29,7 @@ from utils import (
     get_regional_geo_sector,
     get_schools_data,
     
+    get_geo_data,
     get_all_data_for_region_and_var,
     get_all_data_for_timeperiod_and_var,
     get_available_variables,
@@ -87,28 +88,30 @@ t0 = time.time()
 """ ----------------------------------------------------------------------------
 Data Pre-processing
 ---------------------------------------------------------------------------- """
-price_volume_df = get_price_volume_df()
-regional_price_data = get_regional_data("sector_price")
-regional_percentage_delta_data = get_regional_data("sector_percentage_delta")
-regional_geo_data, regional_geo_data_paths = get_regional_geo_data()
-regional_geo_sector = get_regional_geo_sector(regional_geo_data)
-schools_top_500 = get_schools_data()
+# price_volume_df = get_price_volume_df()
+# regional_price_data = get_regional_data("sector_price")
+# regional_percentage_delta_data = get_regional_data("sector_percentage_delta")
+# regional_geo_data, regional_geo_data_paths = get_regional_geo_data()
+# regional_geo_sector = get_regional_geo_sector(regional_geo_data)
+# schools_top_500 = get_schools_data()
 
 # ---------------------------------------------
 
 # initial values:
-initial_year = max(cfg["Years"])
-initial_region = "Greater London"
+# initial_year = max(cfg["Years"])
+# initial_region = "Greater London"
 
-sectors = regional_price_data[initial_year][initial_region]["Sector"].values
-initial_sector = random.choice(sectors)
-initial_geo_sector = [regional_geo_sector[initial_region][initial_sector]]
+# sectors = regional_price_data[initial_year][initial_region]["Sector"].values
+# initial_sector = random.choice(sectors)
+# initial_geo_sector = [regional_geo_sector[initial_region][initial_sector]]
 
 empty_series = pd.DataFrame(np.full(len(cfg["Years"]), np.nan), index=cfg["Years"])
 empty_series.rename(columns={0: ""}, inplace=True)
 
 
 initial_variable = 'total_homes_sold'
+
+geo_data, geo_data_paths = get_geo_data()
 
 variable_list = get_available_variables()
 region_id_lut = get_all_region_info()
@@ -308,83 +311,7 @@ app.layout = html.Div(
                     className="one columns",
                 ),
                  
-                html.Div(
-                    [
-                        dcc.Dropdown(
-                            id="region",
-                            options=[{"label": r, "value": r} for r in regions],
-                            value=initial_region,
-                            clearable=False,
-                            style={"color": "black"},
-                        )
-                    ],
-                    style={
-                        "display": "inline-block",
-                        "padding": "0px 5px 10px 15px",
-                        "width": "15%",
-                    },
-                    className="one columns",
-                ),
-                html.Div(
-                    [
-                        dcc.Dropdown(
-                            id="year",
-                            options=[{"label": y, "value": y} for y in cfg["Years"]],
-                            value=initial_year,
-                            clearable=False,
-                            style={"color": "black"},
-                        ),
-                    ],
-                    style={
-                        "display": "inline-block",
-                        "padding": "0px 5px 10px 0px",
-                        "width": "10%",
-                    },
-                    className="one columns",
-                ),
-                html.Div(
-                    [
-                        dcc.Dropdown(
-                            id="postcode",
-                            options=[
-                                {"label": s, "value": s}
-                                for s in regional_price_data[initial_year][
-                                    initial_region
-                                ].Sector.values
-                            ],
-                            value=[initial_sector],
-                            clearable=True,
-                            multi=True,
-                            style={"color": "black"},
-                        ),
-                    ],
-                    style={
-                        "display": "inline-block",
-                        "padding": "0px 5px 10px 0px",
-                        "width": "20%",
-                    },
-                    className="seven columns",
-                ),
-                html.Div(
-                    [
-                        dbc.RadioItems(
-                            id="graph-type",
-                            options=[
-                                {"label": i, "value": i}
-                                for i in ["Price", "Volume", "Yr-to-Yr price ±%"]
-                            ],
-                            value="Price",
-                            inline=True,
-                        )
-                    ],
-                    style={
-                        "display": "inline-block",
-                        "textAlign": "center",
-                        "padding": "5px 0px 10px 10px",
-                        "width": "33%",
-                    },
-                    className="two columns",
-                ),
+
             ],
             style={"padding": "5px 0px 10px 20px"},
             className="row",
@@ -412,30 +339,7 @@ app.layout = html.Div(
                                             },
                                             className="eight columns",
                                         ),
-                                        html.Div(
-                                            [
-                                                dcc.Checklist(
-                                                    id="school-checklist",
-                                                    options=[
-                                                        {
-                                                            "label": "Show Top 500 Schools",  # noqa: E501
-                                                            "value": "True",
-                                                        },
-                                                    ],
-                                                    value=[],
-                                                    labelStyle={
-                                                        "display": "inline-block"
-                                                    },
-                                                    inputStyle={"margin-left": "10px"},
-                                                )
-                                            ],
-                                            style={
-                                                "display": "inline-block",
-                                                "textAlign": "right",
-                                                "width": "34%",
-                                            },
-                                            className="four columns",
-                                        ),
+      
                                     ]
                                 ),
                                 dcc.Graph(id="choropleth"),
@@ -453,23 +357,6 @@ app.layout = html.Div(
                 html.Div(
                     id="graph-container",
                     children=[
-                        html.Div(
-                            [
-                                dcc.Checklist(
-                                    id="property-type-checklist",
-                                    options=[
-                                        {"label": "F: Flats/Maisonettes", "value": "F"},
-                                        {"label": "T: Terraced", "value": "T"},
-                                        {"label": "S: Semi-Detached", "value": "S"},
-                                        {"label": "D: Detached", "value": "D"},
-                                    ],
-                                    value=["F", "T", "S", "D"],
-                                    labelStyle={"display": "inline-block"},
-                                    inputStyle={"margin-left": "10px"},
-                                ),
-                            ],
-                            style={"textAlign": "right"},
-                        ),
                         html.Div([dcc.Graph(id="price-time-series")]),
                     ],
                     style={
@@ -598,26 +485,34 @@ def update_Choropleth(variable, geo_type, duration, region_ids):
     df = df[df['region_id'].isin(region_id_lut[geo_type])]
     df['Price'] = df[variable]
     
-    df['Sector'] = df['region_id'].map(lambda i: region_id_lut[geo_type][i])
+    df['region_name'] = df['region_id'].map(lambda i: region_id_lut[geo_type][i])
     
     def format_hover_text(i):
         outline = '{name}\n{variable}: {value}'
         return outline.format(
-            name = i.Sector,
+            name = i.region_name,
             variable = variable,
             value = i[variable]
             )
     df['text'] = df.apply(format_hover_text, axis=1)
     
+    # For high-lighting mechanism ----------------------# 
+    #---------probably need to use below to highlight on map those values cliked in bar------------------
+    changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]
+
+    if "geo-type" not in changed_id:
+        highlighted_geoms = geo_data[geo_type].query("region_id.isin(@region_ids)").__geo_interface__
+    else:
+        highlighted_geoms = None
+
     
     fig = get_figure(
         df = df,
-        #geo_data = cfg['assets dir'].joinpath(regional_geo_data_paths['Counties']).as_posix(),
-        geo_data = app.get_asset_url(regional_geo_data_paths[geo_type]),
+        geo_data = app.get_asset_url(geo_data_paths[geo_type]),
         region=geo_type,
         gtype='Price', #TODO, get rid of this. have a single val column in all data
         year=None,
-        geo_sectors=None,
+        geo_sectors=highlighted_geoms,
         school=[],
         schools_top_500=None,
     )
@@ -630,22 +525,7 @@ def update_Choropleth(variable, geo_type, duration, region_ids):
     else:
         df = regional_percentage_delta_data[year][region]
 
-    # For high-lighting mechanism ----------------------#
-    #---------probably need to use below to highlight on map those values cliked in bar------------------
-    changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]
-    geo_sectors = dict()
-
-    if "region" not in changed_id:
-        for k in regional_geo_data[region].keys():
-            if k != "features":
-                geo_sectors[k] = regional_geo_data[region][k]
-            else:
-                geo_sectors[k] = [
-                    regional_geo_sector[region][sector]
-                    for sector in sectors
-                    if sector in regional_geo_sector[region]
-                ]
-
+  
     # Updating figure ----------------------------------#
     fig = get_figure(
         df,
@@ -653,7 +533,7 @@ def update_Choropleth(variable, geo_type, duration, region_ids):
         region,
         gtype,
         year,
-        geo_sectors,
+        highlighted_geoms,
         school,
         schools_top_500,
     )
@@ -727,34 +607,36 @@ def update_price_timeseries(region_ids, variable):
 
 # # Update postcode dropdown values with clickData, selectedData and region
 # @app.callback(
-#     Output("postcode", "value"),
+#     Output("region_id", "value"),
 #     [
 #         Input("choropleth", "clickData"),
 #         Input("choropleth", "selectedData"),
-#         Input("region", "value"),
-#         Input("school-checklist", "value"),
-#         State("postcode", "value"),
+#         Input("geo-type", "value"), 
+        
+#         #Input("region", "value"),
+#         #Input("school-checklist", "value"),
+#         State("region_id", "value"),
 #         State("choropleth", "clickData"),
 #     ],
 # )
 # def update_postcode_dropdown(
-#     clickData, selectedData, region, school, postcodes, clickData_state
+#     clickData, selectedData, geo_type, region_ids, clickData_state
 # ):
 
 #     # Logic for initialisation or when Schoold sre selected
 #     if dash.callback_context.triggered[0]["value"] is None:
-#         return postcodes
+#         return region_ids
 
 #     changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]
 
-#     if len(school) > 0 or "school" in changed_id:
-#         clickData_state = None
-#         return []
+#     # if len(school) > 0 or "school" in changed_id:
+#     #     clickData_state = None
+#     #     return []
 
 #     # --------------------------------------------#
 
-#     if "region" in changed_id:
-#         postcodes = []
+#     if "geo-type" in changed_id:
+#         region_ids = []
 #     elif "selectedData" in changed_id:
 #         postcodes = [D["location"] for D in selectedData["points"][: cfg["topN"]]]
 #     elif clickData is not None and "location" in clickData["points"][0]:

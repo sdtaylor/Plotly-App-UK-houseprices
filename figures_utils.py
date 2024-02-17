@@ -32,8 +32,8 @@ def get_Choropleth(df, geo_data, arg, marker_opacity,
     fig.add_trace(
             go.Choroplethmapbox(
                 geojson = geo_data,
-                locations = df['Sector'],
-                featureidkey = "properties.name",
+                locations = df['region_id'],
+                featureidkey = "properties.region_id",
                 colorscale = arg['colorscale'],
                 z = arg['z_vec'],
                 zmin = arg['min_value'],
@@ -180,6 +180,7 @@ def price_ts(df, title, colors):
                       autosize=True,
                       font_color=colors['text'])
     return fig
+
 
 
 def get_average_price_by_year(df, sectors):

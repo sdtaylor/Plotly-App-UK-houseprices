@@ -4,6 +4,7 @@ import pandas as pd
 import logging
 from copy import deepcopy
 
+import geopandas as gpd
 import sqlite3
 
 from config import config as cfg
@@ -68,6 +69,23 @@ def get_schools_data():
     schools_top_500['Best Rank'] *= -1 #reverse the rankings solely for display purpose
     return schools_top_500
 
+def get_geo_data():
+    """ 
+    Return 2 dictionaries. One with geodata as a geopandas dataframe, another
+    with the underlying data path.
+    
+    {'counties':gpd.GeoDataFrame, 'metros':gpd.GeoDataFrame}, ('counties':'filename','metros':'filename')
+    """
+    geo_data = dict()
+    geo_data_paths = dict()
+    for geo_type, data_file in cfg['geodata_files'].items():
+        #fname = f'geodata_{region}.json'
+        geo_data_paths[geo_type] = data_file
+
+        infile = cfg['assets dir'].joinpath(data_file)
+        geo_data[geo_type] = gpd.read_file(infile)
+
+    return geo_data, geo_data_paths
 
 # local_db = duckdb.connect()
 
@@ -131,7 +149,7 @@ def get_available_variables():
         )
 
 #TODO: optimize to another table
-def get_all_region_info():
+def get_all_region_info(return_mapping=True):
     region_info = {}
 
     q = """
@@ -141,9 +159,12 @@ def get_all_region_info():
     with sqlite3.connect(cfg['data_db']) as con:
         all_region_info = pd.read_sql(q, con)
     
-    # Make a mapping of {region_id:region_name,...}
-    region_info['counties'] = all_region_info.query("region_type=='county'").set_index('region_id').to_dict()['region_name']
-    region_info['metros'] = all_region_info.query("region_type=='metro'").set_index('region_id').to_dict()['region_name']
-
-    return region_info
+    if return_mapping:
+        # Make a mapping of {region_id:region_name,...}
+        region_info['counties'] = all_region_info.query("region_type=='county'").set_index('region_id').to_dict()['region_name']
+        region_info['metros'] = all_region_info.query("region_type=='metro'").set_index('region_id').to_dict()['region_name']
+    
+        return region_info
+    else:
+        return all_region_info
 
