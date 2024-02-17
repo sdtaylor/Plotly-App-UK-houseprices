@@ -114,8 +114,10 @@ initial_variable = 'total_homes_sold'
 geo_data, geo_data_paths = get_geo_data()
 
 variable_list = get_available_variables()
+# a dictionary with {region_id:region_name,} for some things
 region_id_lut = get_all_region_info()
-
+# a data.frame with the same info for other things.
+region_id_df  = get_all_region_info(return_mapping=False) 
 
 all_time_periods = get_all_data_for_region_and_var(region_ids=[2272], variable=initial_variable)
 
@@ -556,8 +558,6 @@ def update_price_timeseries(region_ids, variable):
 
     if len(region_ids) == 0:
         return price_ts(empty_series, "Please select regions", colors)
-    elif len(region_ids) > 1:
-        logging.info('>1 region selected. only plotting the 1st in the timeseries')
 
     if len(variable) == 0:
         return price_ts(
@@ -566,12 +566,13 @@ def update_price_timeseries(region_ids, variable):
 
     # --------------------------------------------------#
     df = get_all_data_for_region_and_var(region_ids = region_ids, variable=variable)
+    df = df.merge(region_id_df[['region_id','region_name']], how='left', on='region_id')
     df['period_end'] = pd.to_datetime(df['period_end'])
     
     df = df.sort_values('period_end')
     
     title = f'{variable}'
-    fig = px.scatter(df, x='period_end', y=variable,
+    fig = px.scatter(df, x='period_end', y=variable, color='region_name',
                      title=title)
     fig.update_traces(mode='lines+markers')
     fig.update_xaxes(showgrid=False)
