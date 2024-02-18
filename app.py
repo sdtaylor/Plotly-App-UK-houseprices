@@ -46,15 +46,15 @@ logging.info(f"System: {sys.version}")
 """ ----------------------------------------------------------------------------
  App Settings
 ---------------------------------------------------------------------------- """
-regions = [
-    "Greater London",
-    "South East",
-    "South West",
-    "Midlands",
-    "North England",
-    "Wales",
-    "Counties",
-]
+# regions = [
+#     "Greater London",
+#     "South East",
+#     "South West",
+#     "Midlands",
+#     "North England",
+#     "Wales",
+#     "Counties",
+# ]
 
 colors = {"background": "#1F2630", "text": "#7FDBFF"}
 
@@ -158,7 +158,7 @@ app.layout = html.Div(
                 html.Div(
                     [
                         html.Div(
-                            [html.H1(children="England and Wales House Prices")],
+                            [html.H1(children="USA Real Estate Metrics")],
                             style={
                                 "display": "inline-block",
                                 "width": "74%",
@@ -200,11 +200,8 @@ app.layout = html.Div(
         ),
         html.Div(
             [
-                dcc.Link(
-                    f"HM Land Registry Price Paid Data from 01 Jan 1995 to {cfg['latest date']}",  # noqa: E501
-                    href="https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads",  # noqa: E501
-                    target="_blank",
-                    # style={'color': colors['text']}
+                dcc.Markdown(
+                    "Data provided by [Redfin](https://www.redfin.com/), a national real estate brokerage"
                 )
             ],
             style={"padding": "5px 0px 5px 20px"},
@@ -225,7 +222,7 @@ app.layout = html.Div(
                     style={
                         "display": "inline-block",
                         "padding": "0px 5px 10px 15px",
-                        "width": "10%",
+                        "width": "20%",
                     },
                     className="one columns",
                 ),
@@ -264,7 +261,7 @@ app.layout = html.Div(
                     ],
                     style={
                         "display": "inline-block",
-                        "padding": "0px 5px 10px 15px",
+                        "padding": "0px 5px 10px 5px",
                         "width": "10%",
                     },
                     className="one columns",
@@ -286,7 +283,7 @@ app.layout = html.Div(
                         "display": "inline-block",
                         "textAlign": "center",
                         "padding": "5px 0px 10px 10px",
-                        "width": "10%",
+                        "width": "20%",
                     },
                     className="two columns",
                 ),
@@ -427,24 +424,6 @@ app.layout = html.Div(
 )
 def update_map_title(variable, duration, geo_type):
     return f"{variable} for {geo_type} and {duration} smoothing window"
-    
-    
-    if len(school) > 0:
-        return "Top 500 schools (Postcode selection disabled)"
-    elif gtype == "Price":
-        return f"Avg house price (all property types) by postcode sector in {region}, {year}"  # noqa: E501
-    elif gtype == "Volume":
-        return (
-            f"Sales Volume (all property types) by postcode sector in {region}, {year}"
-        )
-    else:
-        if year == 1995:
-            return f"Data from {year-1} to {year} not available"
-        else:
-            return (
-                f"Yr-to-yr average price % change in {region}, from {year-1} to {year}"
-            )
-
 
 # Update region dropdown options with either county or metro selections
 @app.callback(
