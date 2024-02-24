@@ -38,6 +38,7 @@ config = {
     'geodata_files' : {
         'counties' : 'geodata_counties.json',
         'metros'   : 'geodata_metros.json',
+        'all'      : 'geodata_all.json',
         },
 
     "regions_lookup": {
@@ -62,7 +63,8 @@ config = {
          'South East':     {'centre': [51.5, -0.1], 'maxp': 90, 'zoom': 7.3},
          'Greater London': {'centre': [51.5, -0.1], 'maxp': 80, 'zoom': 8.9},
          'counties':       {'centre': [40.1, -100], 'maxp': 99, 'zoom': 4.0},
-         'metros':       {'centre': [40.1, -100], 'maxp': 99, 'zoom': 4.0},
+         'metros':         {'centre': [40.1, -100], 'maxp': 99, 'zoom': 4.0},
+         'all':            {'centre': [40.1, -100], 'maxp': 99, 'zoom': 4.0},
          },
 
     "logging format": "pid %(process)5s [%(asctime)s] %(levelname)8s: %(message)s"

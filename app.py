@@ -269,13 +269,13 @@ app.layout = html.Div(
                 
                 html.Div(
                     [
-                        dbc.RadioItems(
-                            id="geo-type",
+                        dbc.Checklist(
+                            id="geo_types",
                             options=[
                                 {'label':'Counties', 'value':'counties'},
                                 {'label':'Metro Areas', 'value':'metros'},
                             ],
-                            value="counties",
+                            value=["counties",'metros'],
                             inline=True,
                         )
                     ],
@@ -417,27 +417,32 @@ app.layout = html.Div(
     [
         Input('variable', 'value'),
         Input("duration", "value"),
-        Input("geo-type", "value"),
+        Input("geo_types", "value"),
         #Input("graph-type", "value"),
         #Input("school-checklist", "value"),
     ],
 )
-def update_map_title(variable, duration, geo_type):
-    return f"{variable} for {geo_type} and {duration} smoothing window"
+def update_map_title(variable, duration, geo_types):
+    return f"{variable} for {geo_types} and {duration} smoothing window"
 
 # Update region dropdown options with either county or metro selections
 @app.callback(
     Output("region_id", "options"), 
     [
-     Input("geo-type", "value"), 
+     Input("geo_types", "value"), 
      #Input("year", "value")
      ]
 )
-def update_region_entries(geo_type):
-    return [
-        {"label": r_lab, "value": r_id}
-        for r_id, r_lab in region_id_lut[geo_type].items()
-    ]
+def update_region_entries(geo_types):
+    region_list = []
+    for gtype in geo_types:
+        region_list.extend(
+            {"label": r_lab, "value": r_id}
+            for r_id, r_lab in region_id_lut[gtype].items()
+            )
+    #TODO: sort alphabetical here
+    return region_list
+
 
 
 # Update choropleth-graph with year, region, graph-type update & sectors
@@ -445,7 +450,7 @@ def update_region_entries(geo_type):
     Output("choropleth", "figure"),
     [
         Input('variable','value'),
-        Input("geo-type", "value"), 
+        Input("geo_types", "value"), 
         Input("duration", "value"),
         Input("region_id", "value"),
              
@@ -456,17 +461,26 @@ def update_region_entries(geo_type):
       #  Input("school-checklist", "value"),
     ],
 )  # @cache.memoize(timeout=cfg['timeout'])
-def update_Choropleth(variable, geo_type, duration, region_ids):
+def update_Choropleth(variable, geo_types, duration, region_ids):
+    if 'metros' in geo_types and 'counties' in geo_types:
+        geo_types='all'
+    else:
+        geo_types=geo_types[0]
+    
+    
     logging.info('update_choropleth: setting things up')
     #variable = initial_variable
     df = get_all_data_for_timeperiod_and_var(variable)
     #df = get_all_data_for_region_and_var(region_id=2772, variable=variable)
     # counties only
 
-    df = df[df['region_id'].isin(region_id_lut[geo_type])]
+    # don't think i need to filter by region id. chlroplet map will
+    # just ignore data entries w/ no map entry, I think
+    #df = df[df['region_id'].isin(region_id_lut[geo_type])]
+    
     df['Price'] = df[variable]
     
-    df['region_name'] = df['region_id'].map(lambda i: region_id_lut[geo_type][i])
+    df = df.merge(region_id_df[['region_id','region_name']], how='left', on='region_id')
     
     def format_hover_text(i):
         outline = '{name}\n{variable}: {value}'
@@ -481,16 +495,16 @@ def update_Choropleth(variable, geo_type, duration, region_ids):
     #---------probably need to use below to highlight on map those values cliked in bar------------------
     changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]
 
-    if "geo-type" not in changed_id:
-        highlighted_geoms = geo_data[geo_type].query("region_id.isin(@region_ids)").__geo_interface__
+    if "geo_types" not in changed_id:
+        highlighted_geoms = geo_data[geo_types].query("region_id.isin(@region_ids)").__geo_interface__
     else:
         highlighted_geoms = None
 
     
     fig = get_figure(
         df = df,
-        geo_data = app.get_asset_url(geo_data_paths[geo_type]),
-        region=geo_type,
+        geo_data = app.get_asset_url(geo_data_paths[geo_types]),
+        region=geo_types,
         gtype='Price', #TODO, get rid of this. have a single val column in all data
         year=None,
         geo_sectors=highlighted_geoms,
@@ -591,7 +605,7 @@ def update_price_timeseries(region_ids, variable):
 #     [
 #         Input("choropleth", "clickData"),
 #         Input("choropleth", "selectedData"),
-#         Input("geo-type", "value"), 
+#         Input("geo_types", "value"), 
         
 #         #Input("region", "value"),
 #         #Input("school-checklist", "value"),
@@ -615,7 +629,7 @@ def update_price_timeseries(region_ids, variable):
 
 #     # --------------------------------------------#
 
-#     if "geo-type" in changed_id:
+#     if "geo_types" in changed_id:
 #         region_ids = []
 #     elif "selectedData" in changed_id:
 #         postcodes = [D["location"] for D in selectedData["points"][: cfg["topN"]]]
