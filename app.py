@@ -577,12 +577,13 @@ def update_Choropleth(variable, geo_types, duration, region_ids, period_end):
      Input("region_id", "value"),
      Input('variable','value'),
      Input("duration", "value"),
+     Input("period_end", "value"),
     # Input("postcode", "value"), 
     # Input("property-type-checklist", "value")
      ],
 )
 @cache.memoize(timeout=cfg["timeout"])
-def update_price_timeseries(region_ids, variable, duration):
+def update_price_timeseries(region_ids, variable, duration, period_end):
 
     if len(region_ids) == 0:
         return price_ts(empty_series, "Please select regions", colors)
@@ -611,6 +612,13 @@ def update_price_timeseries(region_ids, variable, duration):
                      labels = labels,
                      title=title)
     fig.update_traces(mode='lines+markers')
+    fig.add_vline(x=pd.to_datetime(period_end), 
+                  line_width=3, 
+                  line_dash="dash", 
+                  line_color="white", 
+                  #annotation_text="Map data date", 
+                  #annotation_position="top right",
+                  )
     fig.update_xaxes(showgrid=False)
     fig.update_layout(margin={'l': 20, 'b': 30, 'r': 10, 't': 60},
                       plot_bgcolor=colors['background'],
