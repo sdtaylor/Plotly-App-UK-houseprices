@@ -33,7 +33,9 @@ from utils import (
     get_all_data_for_region_and_var,
     get_all_data_for_timeperiod_and_var,
     get_variable_info,
-    get_all_region_info
+    get_all_region_info,
+    get_timeperiod_info,
+    get_end_dates_for_durations,
 )
 
 warnings.filterwarnings("ignore")
@@ -110,6 +112,7 @@ empty_series.rename(columns={0: ""}, inplace=True)
 
 
 initial_variable = 'total_homes_sold'
+initial_duration = '4 weeks'
 
 geo_data, geo_data_paths = get_geo_data()
 
@@ -120,7 +123,8 @@ region_id_lut = get_all_region_info()
 # a data.frame with the same info for other things.
 region_id_df  = get_all_region_info(return_mapping=False) 
 
-all_time_periods = get_all_data_for_region_and_var(region_ids=[2272], variable=initial_variable)
+time_period_info = get_timeperiod_info()
+duration_period_end_dates = get_end_dates_for_durations()
 
 """ ----------------------------------------------------------------------------
  Dash App
@@ -254,8 +258,8 @@ app.layout = html.Div(
                     [
                         dcc.Dropdown(
                             id="duration",
-                            options=[{"label": v, "value": v} for v in ['1 weeks']],
-                            value='1 weeks',
+                            options=[{"label": v, "value": v} for v in ['1 weeks','4 weeks','12 weeks']],
+                            value=initial_duration,
                             clearable=False,
                             style={"color": "black"},
                         )
@@ -293,12 +297,13 @@ app.layout = html.Div(
                 html.Div(
                     [
                         dcc.Dropdown(
-                            id="period_ending",
+                            id="period_end",
                             options=[
                                 {"label": i, "value": i}
-                                for i in ['2024-01-21']
+                                for i in duration_period_end_dates[initial_duration]
                             ],
-                            value="Counties",
+                            # most recent date as the default
+                            value=max(duration_period_end_dates[initial_duration]),
                             clearable=False,
                             style={"color": "black"},
                         )
@@ -425,11 +430,12 @@ app.layout = html.Div(
         Input('variable', 'value'),
         Input("duration", "value"),
         Input("geo_types", "value"),
+        Input("period_end", "value"),
         #Input("graph-type", "value"),
         #Input("school-checklist", "value"),
     ],
 )
-def update_map_title(variable, duration, geo_types):
+def update_map_title(variable, duration, geo_types, period_end):
     if 'metros' in geo_types and 'counties' in geo_types:
         geo_type_text= 'Counties and Metro Areas'
     elif 'metros' in geo_types:
@@ -442,7 +448,9 @@ def update_map_title(variable, duration, geo_types):
     variable_text = variable_info.query('variable==@variable').iloc[0].pretty_name
     variable_text = var_pretty_name_lut.get(variable, '')
     
-    return f"{variable_text} for {geo_type_text}. Using a {duration} smoothing window."
+    period_end_text = period_end
+    
+    return f"{variable_text} for {geo_type_text}. Using a {duration} smoothing window and period ending {period_end_text}"
 
 # Update region dropdown options with either county or metro selections
 @app.callback(
@@ -462,7 +470,14 @@ def update_region_entries(geo_types):
     #TODO: sort alphabetical here
     return region_list
 
-
+@app.callback(
+    Output("period_end","options"),
+    [
+     Input('duration','value'),
+     ]
+)
+def update_end_date_entries(duration):
+    return duration_period_end_dates[duration]
 
 # Update choropleth-graph with year, region, graph-type update & sectors
 @app.callback(
@@ -472,7 +487,7 @@ def update_region_entries(geo_types):
         Input("geo_types", "value"), 
         Input("duration", "value"),
         Input("region_id", "value"),
-             
+        Input("period_end", "value"),
       #  Input("year", "value"),
       #  Input("region", "value"),
       #  Input("graph-type", "value"),
@@ -480,7 +495,7 @@ def update_region_entries(geo_types):
       #  Input("school-checklist", "value"),
     ],
 )  # @cache.memoize(timeout=cfg['timeout'])
-def update_Choropleth(variable, geo_types, duration, region_ids):
+def update_Choropleth(variable, geo_types, duration, region_ids, period_end):
     if 'metros' in geo_types and 'counties' in geo_types:
         geo_types='all'
     else:
@@ -489,7 +504,7 @@ def update_Choropleth(variable, geo_types, duration, region_ids):
     
     logging.info('update_choropleth: setting things up')
     #variable = initial_variable
-    df = get_all_data_for_timeperiod_and_var(variable)
+    df = get_all_data_for_timeperiod_and_var(variable, duration=duration, period_end=period_end)
     #df = get_all_data_for_region_and_var(region_id=2772, variable=variable)
     # counties only
 
@@ -561,12 +576,13 @@ def update_Choropleth(variable, geo_types, duration, region_ids):
     [
      Input("region_id", "value"),
      Input('variable','value'),
+     Input("duration", "value"),
     # Input("postcode", "value"), 
     # Input("property-type-checklist", "value")
      ],
 )
 @cache.memoize(timeout=cfg["timeout"])
-def update_price_timeseries(region_ids, variable):
+def update_price_timeseries(region_ids, variable, duration):
 
     if len(region_ids) == 0:
         return price_ts(empty_series, "Please select regions", colors)
@@ -577,7 +593,7 @@ def update_price_timeseries(region_ids, variable):
         )
 
     # --------------------------------------------------#
-    df = get_all_data_for_region_and_var(region_ids = region_ids, variable=variable)
+    df = get_all_data_for_region_and_var(region_ids = region_ids, variable=variable, duration=duration)
     df = df.merge(region_id_df[['region_id','region_name']], how='left', on='region_id')
     df['period_end'] = pd.to_datetime(df['period_end'])
     

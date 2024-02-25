@@ -130,6 +130,26 @@ def get_all_data_for_timeperiod_and_var(variable, period_end=LAST_PERIOD, durati
 def get_variable_info():
     return pd.read_csv(cfg['variable_info_file'])
 
+def get_timeperiod_info():
+    q = """
+    SELECT DISTINCT period_begin, period_end, duration 
+    FROM weekly_data_raw
+    """
+    with sqlite3.connect(cfg['data_db']) as con:
+        df = pd.read_sql(q, con)
+    
+    return df
+
+def get_end_dates_for_durations():
+    df = get_timeperiod_info()
+    
+    duration_end_dates = {}
+    for duration in df.duration.unique():
+        # sort descending so most recent dates are 1st in drop down
+        duration_end_dates[duration] =  df.query("duration==@duration").period_end.sort_values(ascending=False).tolist()
+
+    return duration_end_dates
+
 #TODO: optimize to another table
 def get_all_region_info(return_mapping=True):
     region_info = {}
