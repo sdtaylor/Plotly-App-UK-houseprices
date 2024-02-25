@@ -517,11 +517,11 @@ def update_Choropleth(variable, geo_types, duration, region_ids, period_end):
     df = df.merge(region_id_df[['region_id','region_name']], how='left', on='region_id')
     
     def format_hover_text(i):
-        outline = '{name}\n{variable}: {value}'
+        outline = '{name}<br>{variable}: {value}'
         return outline.format(
             name = i.region_name,
-            variable = variable,
-            value = i[variable]
+            variable = var_pretty_name_lut[variable],
+            value = round(i[variable],2)
             )
     df['text'] = df.apply(format_hover_text, axis=1)
     
