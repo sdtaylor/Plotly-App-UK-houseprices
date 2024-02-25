@@ -132,8 +132,7 @@ def get_variable_info():
 
 def get_timeperiod_info():
     q = """
-    SELECT DISTINCT period_begin, period_end, duration 
-    FROM weekly_data_raw
+    SELECT * from timeperiod_info
     """
     with sqlite3.connect(cfg['data_db']) as con:
         df = pd.read_sql(q, con)
@@ -150,13 +149,11 @@ def get_end_dates_for_durations():
 
     return duration_end_dates
 
-#TODO: optimize to another table
 def get_all_region_info(return_mapping=True):
     region_info = {}
 
     q = """
-    SELECT distinct region_type, region_id, region_name
-    FROM weekly_data_raw
+    SELECT * FROM region_info
     """
     with sqlite3.connect(cfg['data_db']) as con:
         all_region_info = pd.read_sql(q, con)
