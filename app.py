@@ -32,7 +32,7 @@ from utils import (
     get_geo_data,
     get_all_data_for_region_and_var,
     get_all_data_for_timeperiod_and_var,
-    get_available_variables,
+    get_variable_info,
     get_all_region_info
 )
 
@@ -113,7 +113,8 @@ initial_variable = 'total_homes_sold'
 
 geo_data, geo_data_paths = get_geo_data()
 
-variable_list = get_available_variables()
+variable_info = get_variable_info().sort_values('variable')
+var_pretty_name_lut = {v.variable:v.pretty_name for v in  variable_info.itertuples()}
 # a dictionary with {region_id:region_name,} for some things
 region_id_lut = get_all_region_info()
 # a data.frame with the same info for other things.
@@ -213,7 +214,7 @@ app.layout = html.Div(
                     [
                         dcc.Dropdown(
                             id="variable",
-                            options=[{"label": v, "value": v} for v in variable_list],
+                            options=[{"label": v.pretty_name, "value": v.variable} for v in variable_info.itertuples()],
                             value=initial_variable,
                             clearable=False,
                             style={"color": "black"},
@@ -423,7 +424,19 @@ app.layout = html.Div(
     ],
 )
 def update_map_title(variable, duration, geo_types):
-    return f"{variable} for {geo_types} and {duration} smoothing window"
+    if 'metros' in geo_types and 'counties' in geo_types:
+        geo_type_text= 'Counties and Metro Areas'
+    elif 'metros' in geo_types:
+        geo_type_text= 'Metro Areas'
+    elif 'counties' in geo_types:
+        geo_type_text= 'Counties'
+    else:
+        geo_type_text = ''
+    
+    variable_text = variable_info.query('variable==@variable').iloc[0].pretty_name
+    variable_text = var_pretty_name_lut.get(variable, '')
+    
+    return f"{variable_text} for {geo_type_text}. Using a {duration} smoothing window."
 
 # Update region dropdown options with either county or metro selections
 @app.callback(
@@ -564,8 +577,16 @@ def update_price_timeseries(region_ids, variable):
     
     df = df.sort_values('period_end')
     
-    title = f'{variable}'
+    title = var_pretty_name_lut.get(variable)
+    
+    labels = {
+            'period_end' : '',
+            'region_name' : '',
+             variable : '',
+        }
+    
     fig = px.scatter(df, x='period_end', y=variable, color='region_name',
+                     labels = labels,
                      title=title)
     fig.update_traces(mode='lines+markers')
     fig.update_xaxes(showgrid=False)

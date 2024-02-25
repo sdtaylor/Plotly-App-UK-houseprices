@@ -127,26 +127,8 @@ def get_all_data_for_timeperiod_and_var(variable, period_end=LAST_PERIOD, durati
     return df
 
 #TODO: make this a mapping with pretty var names
-def get_available_variables():
-    table_cols_to_exclude = ['index','region_type_id','region_name','region_type',
-                             'period_begin','period_end','duration','region_id',
-                             'last_updated',
-                             ]
-    
-    with sqlite3.connect(cfg['data_db']) as con:
-        cols = pd.read_sql('select * from weekly_data_raw limit 1', con).columns
-    
-    return [c for c in cols if c not in table_cols_to_exclude]
-    
-    #TODO: drop this if never using duckdb   
-    return ( 
-        local_db
-        .execute('describe weekly_data_by_region')
-        .df()
-        .query("~column_name.isin(@table_cols_to_exclude)")
-        .column_name
-        .tolist()
-        )
+def get_variable_info():
+    return pd.read_csv(cfg['variable_info_file'])
 
 #TODO: optimize to another table
 def get_all_region_info(return_mapping=True):

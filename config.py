@@ -34,6 +34,8 @@ config = {
         },
     
     'data_db': appDataPath.joinpath('data.sqlite'),
+    
+    'variable_info_file' : appDataPath.joinpath('variable_info.csv'),
 
     'geodata_files' : {
         'counties' : 'geodata_counties.json',
