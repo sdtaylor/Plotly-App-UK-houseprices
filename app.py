@@ -335,7 +335,7 @@ app.layout = html.Div(
                                             ],
                                             style={
                                                 "display": "inline-block",
-                                                "width": "64%",
+                                                "width": "100%",
                                             },
                                             className="eight columns",
                                         ),
@@ -357,6 +357,12 @@ app.layout = html.Div(
                 html.Div(
                     id="graph-container",
                     children=[
+                        html.Div(
+                            [
+                                dcc.Markdown('spacer text')
+                            ],
+                            style={"textAlign": "left"},
+                        ),
                         html.Div([dcc.Graph(id="price-time-series")]),
                     ],
                     style={
