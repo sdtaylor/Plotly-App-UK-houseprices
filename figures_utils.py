@@ -58,12 +58,12 @@ def get_figure(df, geo_data, region, gtype, year, geo_sectors, school, schools_t
 
     arg = dict()
     if gtype == 'Price':
-        arg['min_value'] = np.percentile(np.array(df.Price), 5)
-        arg['max_value'] = np.percentile(np.array(df.Price), _cfg['maxp'])
+        arg['min_value'] = df['Price'].quantile(0.05)
+        arg['max_value'] = df['Price'].quantile(0.95)
         arg['z_vec'] = df['Price']
         arg['text_vec'] = df['text']
         arg['colorscale'] = "YlOrRd"
-        arg['title'] = "Avg Price (£)"
+        arg['title'] = ""
 
     elif gtype == 'Volume':
         arg['min_value'] = np.percentile(np.array(df.Volume), 5)
