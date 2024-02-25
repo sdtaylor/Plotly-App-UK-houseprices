@@ -626,47 +626,47 @@ def update_price_timeseries(region_ids, variable):
 
 # ----------------------------------------------------#
 
-# # Update postcode dropdown values with clickData, selectedData and region
-# @app.callback(
-#     Output("region_id", "value"),
-#     [
-#         Input("choropleth", "clickData"),
-#         Input("choropleth", "selectedData"),
-#         Input("geo_types", "value"), 
+# Update postcode dropdown values with clickData, selectedData and region
+@app.callback(
+    Output("region_id", "value"),
+    [
+        Input("choropleth", "clickData"),
+        Input("choropleth", "selectedData"),
+        Input("geo_types", "value"), 
         
-#         #Input("region", "value"),
-#         #Input("school-checklist", "value"),
-#         State("region_id", "value"),
-#         State("choropleth", "clickData"),
-#     ],
-# )
-# def update_postcode_dropdown(
-#     clickData, selectedData, geo_type, region_ids, clickData_state
-# ):
+        #Input("region", "value"),
+        #Input("school-checklist", "value"),
+        State("region_id", "value"),
+        State("choropleth", "clickData"),
+    ],
+)
+def update_postcode_dropdown(
+    clickData, selectedData, geo_type, region_ids, clickData_state
+):
 
-#     # Logic for initialisation or when Schoold sre selected
-#     if dash.callback_context.triggered[0]["value"] is None:
-#         return region_ids
+    # Logic for initialisation or when Schoold sre selected
+    if dash.callback_context.triggered[0]["value"] is None:
+        return region_ids
 
-#     changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]
+    changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]
 
-#     # if len(school) > 0 or "school" in changed_id:
-#     #     clickData_state = None
-#     #     return []
+    # if len(school) > 0 or "school" in changed_id:
+    #     clickData_state = None
+    #     return []
 
-#     # --------------------------------------------#
+    # --------------------------------------------#
 
-#     if "geo_types" in changed_id:
-#         region_ids = []
-#     elif "selectedData" in changed_id:
-#         postcodes = [D["location"] for D in selectedData["points"][: cfg["topN"]]]
-#     elif clickData is not None and "location" in clickData["points"][0]:
-#         sector = clickData["points"][0]["location"]
-#         if sector in postcodes:
-#             postcodes.remove(sector)
-#         elif len(postcodes) < cfg["topN"]:
-#             postcodes.append(sector)
-#     return postcodes
+    if "geo_types" in changed_id:
+        region_ids = []
+    elif "selectedData" in changed_id:
+        region_ids = [D["location"] for D in selectedData["points"][: cfg["topN"]]]
+    elif clickData is not None and "location" in clickData["points"][0]:
+        sector = clickData["points"][0]["location"]
+        if sector in region_ids:
+            region_ids.remove(sector)
+        elif len(region_ids) < cfg["topN"]:
+            region_ids.append(sector)
+    return region_ids
 
 
 # ----------------------------------------------------#
