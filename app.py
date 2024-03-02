@@ -111,7 +111,7 @@ empty_series = pd.DataFrame(np.full(len(cfg["Years"]), np.nan), index=cfg["Years
 empty_series.rename(columns={0: ""}, inplace=True)
 
 
-initial_variable = 'total_homes_sold'
+initial_variable = 'median_sale_price'
 initial_duration = '4 weeks'
 
 geo_data, geo_data_paths = get_geo_data()
@@ -611,7 +611,8 @@ def update_price_timeseries(region_ids, variable, duration, period_end):
     fig = px.scatter(df, x='period_end', y=variable, color='region_name',
                      labels = labels,
                      title=title)
-    fig.update_traces(mode='lines+markers')
+    fig.update_traces(mode='lines+markers', hovertemplate=None)
+    fig.update_layout(hovermode="x unified", hoverlabel_bgcolor='#4c535c')
     fig.add_vline(x=pd.to_datetime(period_end), 
                   line_width=3, 
                   line_dash="dash", 
