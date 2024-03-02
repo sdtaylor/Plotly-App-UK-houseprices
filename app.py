@@ -88,6 +88,7 @@ empty_series.rename(columns={0: ""}, inplace=True)
 
 initial_variable = 'median_sale_price'
 initial_duration = '4 weeks'
+initial_regions  = [19740, 14500, 22660] # Denver, Boulder, Ft. Collins metros
 
 geo_data, geo_data_paths = get_geo_data()
 
@@ -217,7 +218,7 @@ app.layout = html.Div(
                                 {"label": r_lab, "value": r_id}
                                 for r_id, r_lab in region_id_lut['counties'].items()
                             ],
-                            value=[],
+                            value=initial_regions,
                             clearable=True,
                             multi=True,
                             style={"color": "black"},
