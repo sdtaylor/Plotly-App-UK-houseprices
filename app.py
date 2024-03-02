@@ -56,24 +56,11 @@ colors = {"background": "#1F2630", "text": "#7FDBFF"}
 
 NOTES = """
     **Notes:**
-    1. Property type "Other" is filtered from the house price data.
+    1. Duration represents the smoothing window used.
     2. School ranking (2018-2019) is the best of GCSE and A-Level rankings.
     3. GCSE ranking can be misleading - subjects like
     Classics and Latin are excluded from scoring,
     unfairly penalising some schools.
-
-    **Other data sources:**
-    - [OpenStreetMap](https://www.openstreetmap.org)
-    - [Postcode regions mapping](https://www.whichlist2.com/knowledgebase/uk-postcode-map/)
-    - [Postcode boundary data](https://www.opendoorlogistics.com/data/)
-    from [www.opendoorlogistics.com](https://www.opendoorlogistics.com)
-    - Contains Royal Mail data © Royal Mail copyright and database right 2015
-    - Contains National Statistics data © Crown copyright and database right 2015
-    - [School 2019 performance data](https://www.gov.uk/school-performance-tables)
-    (Ranking scores: [Attainment 8 Score](https://www.locrating.com/Blog/attainment-8-and-progress-8-explained.aspx)
-    for GCSE and
-    [Average Point Score](https://dera.ioe.ac.uk/26476/3/16_to_18_calculating_the_average_point_scores_2015.pdf)
-    for A-Level)
 """
 
 t0 = time.time()
@@ -130,7 +117,68 @@ cache = Cache(
 app.config.suppress_callback_exceptions = True
 
 # --------------------------------------------------------#
+# Primary components
+variable_dropdown = dcc.Dropdown(
+    id="variable",
+    options=[initial_variable],
+    value=initial_variable,
+    clearable=False,
+    style={"color": "black"},
+)
 
+region_dropdown = dcc.Dropdown(
+    id="region_id",
+    options=[
+        {"label": r_lab, "value": r_id}
+        for r_id, r_lab in region_id_lut['counties'].items()
+    ],
+    value=initial_regions,
+    clearable=True,
+    multi=True,
+    style={"color": "black"},
+)
+
+duration_dropdown = dcc.Dropdown(
+    id="duration",
+    options=[{"label": v, "value": v} for v in ['1 weeks','4 weeks','12 weeks']],
+    value=initial_duration,
+    clearable=False,
+    style={"color": "black"},
+)
+
+geotype_checklist = dbc.Checklist(
+    id="geo_types",
+    options=[
+        {'label':'Counties', 'value':'counties'},
+        {'label':'Metro Areas', 'value':'metros'},
+    ],
+    value=["counties",'metros'],
+    inline=True,
+)
+
+variable_type_radio = dbc.RadioItems(
+    id="variable_type",
+    options=[
+        {'label':'Key Variables', 'value':'key_vars'},
+        {'label':'All Variables', 'value':'all_vars'},
+    ],
+    value="key_vars",
+    inline=True,
+)
+
+period_dropdown = dcc.Dropdown(
+    id="period_end",
+    options=[
+        {"label": i, "value": i}
+        for i in duration_period_end_dates[initial_duration]
+    ],
+    # most recent date as the default
+    value=max(duration_period_end_dates[initial_duration]),
+    clearable=False,
+    style={"color": "black"},
+)
+
+#--------------------------------------------------------
 app.layout = html.Div(
     id="root",
     children=[
@@ -193,15 +241,7 @@ app.layout = html.Div(
         html.Div(
             [
                 html.Div(
-                    [
-                        dcc.Dropdown(
-                            id="variable",
-                            options=[initial_variable],
-                            value=initial_variable,
-                            clearable=False,
-                            style={"color": "black"},
-                        )
-                    ],
+                    [variable_dropdown],
                     style={
                         "display": "inline-block",
                         "padding": "0px 5px 10px 15px",
@@ -211,19 +251,7 @@ app.layout = html.Div(
                 ),
                 
                 html.Div(
-                    [
-                        dcc.Dropdown(
-                            id="region_id",
-                            options=[
-                                {"label": r_lab, "value": r_id}
-                                for r_id, r_lab in region_id_lut['counties'].items()
-                            ],
-                            value=initial_regions,
-                            clearable=True,
-                            multi=True,
-                            style={"color": "black"},
-                        ),
-                    ],
+                    [region_dropdown],
                     style={
                         "display": "inline-block",
                         "padding": "0px 5px 10px 0px",
@@ -233,15 +261,7 @@ app.layout = html.Div(
                 ),
                 
                 html.Div(
-                    [
-                        dcc.Dropdown(
-                            id="duration",
-                            options=[{"label": v, "value": v} for v in ['1 weeks','4 weeks','12 weeks']],
-                            value=initial_duration,
-                            clearable=False,
-                            style={"color": "black"},
-                        )
-                    ],
+                    [duration_dropdown],
                     style={
                         "display": "inline-block",
                         "padding": "0px 5px 10px 5px",
@@ -251,17 +271,7 @@ app.layout = html.Div(
                 ),
                 
                 html.Div(
-                    [
-                        dbc.Checklist(
-                            id="geo_types",
-                            options=[
-                                {'label':'Counties', 'value':'counties'},
-                                {'label':'Metro Areas', 'value':'metros'},
-                            ],
-                            value=["counties",'metros'],
-                            inline=True,
-                        )
-                    ],
+                    [geotype_checklist],
                     style={
                         "display": "inline-block",
                         "textAlign": "center",
@@ -271,17 +281,7 @@ app.layout = html.Div(
                     className="two columns",
                 ),
                 html.Div(
-                    [
-                        dbc.RadioItems(
-                            id="variable_type",
-                            options=[
-                                {'label':'Key Variables', 'value':'key_vars'},
-                                {'label':'All Variables', 'value':'all_vars'},
-                            ],
-                            value="key_vars",
-                            inline=True,
-                        )
-                    ],
+                    [variable_type_radio],
                     style={
                         "display": "inline-block",
                         "textAlign": "center",
@@ -292,19 +292,7 @@ app.layout = html.Div(
                 ),
                 
                 html.Div(
-                    [
-                        dcc.Dropdown(
-                            id="period_end",
-                            options=[
-                                {"label": i, "value": i}
-                                for i in duration_period_end_dates[initial_duration]
-                            ],
-                            # most recent date as the default
-                            value=max(duration_period_end_dates[initial_duration]),
-                            clearable=False,
-                            style={"color": "black"},
-                        )
-                    ],
+                    [period_dropdown],
                     style={
                         "display": "inline-block",
                         "padding": "0px 5px 10px 15px",
