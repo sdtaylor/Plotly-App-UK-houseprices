@@ -5,7 +5,7 @@ import time
 import warnings
 
 import dash
-import dash_bootstrap_components as dbc
+import dash_mantine_components as dmc
 import dash_core_components as dcc
 import dash_html_components as html
 import numpy as np
@@ -76,6 +76,8 @@ empty_series.rename(columns={0: ""}, inplace=True)
 initial_variable = 'median_sale_price'
 initial_duration = '4 weeks'
 initial_regions  = [19740, 14500, 22660] # Denver, Boulder, Ft. Collins metros
+max_selected_regions = 5
+
 
 geo_data, geo_data_paths = get_geo_data()
 
@@ -102,7 +104,7 @@ app = dash.Dash(
         {"name": "viewport", "content": "width=device-width, initial-scale=1.0"}
     ],
     # external_stylesheets=[dbc.themes.DARKLY]
-    external_stylesheets=[dbc.themes.SUPERHERO],
+    #external_stylesheets=[dbc.themes.SUPERHERO],
 )
 
 server = app.server  # Needed for gunicorn
@@ -117,286 +119,159 @@ cache = Cache(
 app.config.suppress_callback_exceptions = True
 
 # --------------------------------------------------------#
+# Individual components are defined here one by one.
+# They are inserted into the app below.
+title_text = html.H1(children="USA Real Estate Metrics")
+made_with_text = html.H6(children="Created with Dash")
+data_attibution_markdown = dcc.Markdown("Data provided by [Redfin](https://www.redfin.com/), a national real estate brokerage")
+
+
+
 # Primary components
-variable_dropdown = dcc.Dropdown(
+variable_dropdown = dmc.Select(
     id="variable",
-    options=[initial_variable],
+    label="Variable",
+    #placeholder="Select one",
     value=initial_variable,
-    clearable=False,
-    style={"color": "black"},
+    data=[initial_variable],
+    #style={"width": 200, "marginBottom": 10},
 )
 
-region_dropdown = dcc.Dropdown(
+#TODO: ensure max_selected_regions on map clicking
+region_dropdown = dmc.MultiSelect(
+    label="Regions to view in timeseries.",
+    #placeholder="Select all you like!",
     id="region_id",
-    options=[
+    value=initial_regions,
+    data=[
         {"label": r_lab, "value": r_id}
         for r_id, r_lab in region_id_lut['counties'].items()
     ],
-    value=initial_regions,
+    searchable=True,
     clearable=True,
-    multi=True,
-    style={"color": "black"},
+    maxSelectedValues=max_selected_regions,
+    #style={"width": 400, "marginBottom": 10},
 )
 
-duration_dropdown = dcc.Dropdown(
+
+duration_dropdown = dmc.Select(
     id="duration",
-    options=[{"label": v, "value": v} for v in ['1 weeks','4 weeks','12 weeks']],
+    label="Smoothing Window",
     value=initial_duration,
-    clearable=False,
-    style={"color": "black"},
+    data=[{"label": v.replace('s',''), "value": v} for v in ['1 weeks','4 weeks','12 weeks']],
+    #style={"width": 200, "marginBottom": 10},
 )
 
-geotype_checklist = dbc.Checklist(
+geotype_checklist = dmc.CheckboxGroup(
     id="geo_types",
-    options=[
-        {'label':'Counties', 'value':'counties'},
-        {'label':'Metro Areas', 'value':'metros'},
+    label = 'Region types',
+    orientation = 'vertical',
+    children=[
+        dmc.Checkbox(label="Counties", value="counties", checked=True),
+        dmc.Checkbox(label="Metro Areas", value="metros", checked=True),
     ],
     value=["counties",'metros'],
-    inline=True,
 )
 
-variable_type_radio = dbc.RadioItems(
+variable_type_radio = dmc.RadioGroup(
     id="variable_type",
-    options=[
-        {'label':'Key Variables', 'value':'key_vars'},
-        {'label':'All Variables', 'value':'all_vars'},
-    ],
+    label="Variables",
+    orientation = 'vertical',
+    children = [
+        dmc.Radio('Key Variables', value='key_vars'),
+        dmc.Radio('All Variables', value='all_vars'),
+        ],
     value="key_vars",
-    inline=True,
 )
 
-period_dropdown = dcc.Dropdown(
+
+period_dropdown = dmc.Select(
     id="period_end",
-    options=[
+    label="Date",
+    # most recent date as default
+    value=max(duration_period_end_dates[initial_duration]),
+    data=[
         {"label": i, "value": i}
         for i in duration_period_end_dates[initial_duration]
     ],
-    # most recent date as the default
-    value=max(duration_period_end_dates[initial_duration]),
-    clearable=False,
-    style={"color": "black"},
+    #style={"width": 200, "marginBottom": 10},
 )
+
 
 #--------------------------------------------------------
-app.layout = html.Div(
-    id="root",
-    children=[
-        # Header -------------------------------------------------#
-        html.Div(
-            id="header",
-            children=[
-                html.Div(
-                    [
-                        html.Div(
-                            [html.H1(children="USA Real Estate Metrics")],
-                            style={
-                                "display": "inline-block",
-                                "width": "74%",
-                                "padding": "10px 0px 0px 20px",  # top, right, bottom, left
-                            },
-                        ),
-                        html.Div(
-                            [html.H6(children="Created with")],
-                            style={
-                                "display": "inline-block",
-                                "width": "10%",
-                                "textAlign": "right",
-                                "padding": "0px 20px 0px 0px",  # top, right, bottom, left
-                            },
-                        ),
-                        html.Div(
-                            [
-                                html.A(
-                                    [
-                                        html.Img(
-                                            src=app.get_asset_url("dash-logo.png"),
-                                            style={"height": "100%", "width": "100%"},
-                                        )
-                                    ],
-                                    href="https://plotly.com/",
-                                    target="_blank",
-                                )
-                            ],
-                            style={
-                                "display": "inline-block",
-                                "width": "14%",
-                                "textAlign": "right",
-                                "padding": "0px 10px 0px 0px",
-                            },
-                        ),
-                    ]
-                ),
-            ],
-        ),
-        html.Div(
-            [
-                dcc.Markdown(
-                    "Data provided by [Redfin](https://www.redfin.com/), a national real estate brokerage"
-                )
-            ],
-            style={"padding": "5px 0px 5px 20px"},
-        ),
-        # Selection control -------------------------------------#
-        html.Div(
-            [
-                html.Div(
-                    [variable_dropdown],
-                    style={
-                        "display": "inline-block",
-                        "padding": "0px 5px 10px 15px",
-                        "width": "20%",
-                    },
-                    className="one columns",
-                ),
-                
-                html.Div(
-                    [region_dropdown],
-                    style={
-                        "display": "inline-block",
-                        "padding": "0px 5px 10px 0px",
-                        "width": "20%",
-                    },
-                    className="seven columns",
-                ),
-                
-                html.Div(
-                    [duration_dropdown],
-                    style={
-                        "display": "inline-block",
-                        "padding": "0px 5px 10px 5px",
-                        "width": "10%",
-                    },
-                    className="one columns",
-                ),
-                
-                html.Div(
-                    [geotype_checklist],
-                    style={
-                        "display": "inline-block",
-                        "textAlign": "center",
-                        "padding": "5px 0px 10px 10px",
-                        "width": "20%",
-                    },
-                    className="two columns",
-                ),
-                html.Div(
-                    [variable_type_radio],
-                    style={
-                        "display": "inline-block",
-                        "textAlign": "center",
-                        "padding": "5px 0px 10px 10px",
-                        "width": "20%",
-                    },
-                    className="two columns",
-                ),
-                
-                html.Div(
-                    [period_dropdown],
-                    style={
-                        "display": "inline-block",
-                        "padding": "0px 5px 10px 15px",
-                        "width": "10%",
-                    },
-                    className="one columns",
-                ),
-                 
+# Layout and styling
 
-            ],
-            style={"padding": "5px 0px 10px 20px"},
-            className="row",
-        ),
-        # App Container ------------------------------------------#
-        html.Div(
-            id="app-container",
-            children=[
-                # Left Column ------------------------------------#
-                html.Div(
-                    id="left-column",
-                    children=[
-                        html.Div(
-                            id="choropleth-container",
-                            children=[
-                                html.Div(
-                                    [
-                                        html.Div(
-                                            [
-                                                html.H5(id="choropleth-title"),
-                                            ],
-                                            style={
-                                                "display": "inline-block",
-                                                "width": "100%",
-                                            },
-                                            className="eight columns",
-                                        ),
-      
-                                    ]
-                                ),
-                                dcc.Graph(id="choropleth"),
-                            ],
-                        ),
-                    ],
-                    style={
-                        "display": "inline-block",
-                        "padding": "20px 10px 10px 40px",
-                        "width": "59%",
-                    },
-                    className="seven columns",
-                ),
-                # Right Column ------------------------------------#
-                html.Div(
-                    id="graph-container",
-                    children=[
-                        html.Div(
-                            [
-                                dcc.Markdown('spacer text')
-                            ],
-                            style={"textAlign": "left"},
-                        ),
-                        html.Div([dcc.Graph(id="price-time-series")]),
-                    ],
-                    style={
-                        "display": "inline-block",
-                        "padding": "20px 20px 10px 10px",
-                        "width": "39%",
-                    },
-                    className="five columns",
-                ),
-            ],
-            className="row",
-        ),
-        # Notes and credits --------------------------#
-        html.Div(
-            [
-                html.Div(
-                    [dcc.Markdown(NOTES)],
-                    style={
-                        "textAlign": "left",
-                        "padding": "0px 0px 5px 40px",
-                        "width": "69%",
-                    },
-                    className="nine columns",
-                ),
-                html.Div(
-                    [
-                        dcc.Markdown(
-                            "© 2020 Ivan Lai "
-                            + "[[Blog]](https://www.ivanlai.project-ds.net/) "
-                            + "[[Email]](mailto:ivanlai.uk.2020@gmail.com)"
-                        )
-                    ],
-                    style={
-                        "textAlign": "right",
-                        "padding": "10px 20px 0px 0px",
-                        "width": "29%",
-                    },
-                    className="three columns",
-                ),
-            ],
-            className="row",
-        ),
+app.layout = dmc.MantineProvider(
+    withGlobalStyles=True,
+    theme={
+    "colorScheme": "dark",
+    # "shadows": {
+    #     # other shadows (xs, sm, lg) will be merged from default theme
+    #     "md": "1px 1px 3px rgba(0,0,0,.25)",
+    #     "xl": "5px 5px 3px rgba(0,0,0,.25)",
+    # },
+    "headings": {
+        "fontFamily": "Roboto, sans-serif",
+        "sizes": {
+            "h1": {"fontSize": 30},
+        },
+    },
+    },
+    children=[
+        # Header
+        dmc.Grid(
+            children = [
+                dmc.Col(title_text, span='content'),
+                dmc.Col(span='auto'), # empty col to push the made_with_text to the right side
+                dmc.Col(made_with_text, span='content'),
+                ],
+            align = 'center',
+            ),
+        
+        
+        dmc.Grid(
+            children = [
+                dmc.Col(data_attibution_markdown, span='content')
+                ],
+            align = 'flex-start'
+            ),
+        
+        dmc.Space(h=50),
+        
+        # Selection components
+        dmc.Grid(
+            children = [
+                dmc.Col(variable_dropdown, span=2),
+                dmc.Col(region_dropdown, span=5),
+                dmc.Col(duration_dropdown, span=1),
+                dmc.Col(period_dropdown, span=1),
+                dmc.Col(geotype_checklist, span=1),
+                dmc.Col(variable_type_radio, span=1),
+                ],
+            align = 'flex-start'
+            ),
+        
+        dmc.Space(h=30),
+        
+        # Map title
+        dmc.Grid(
+            children = [
+                dmc.Col(html.H4(id="choropleth-title"), span='content')
+                ],
+            align = 'flex-start'
+            ),
+        
+        # Map and timeseries chart
+        dmc.Grid(
+            children = [
+                dmc.Col(dcc.Graph(id="choropleth"), span=7),
+                dmc.Col(dcc.Graph(id="price-time-series"), span=5)
+                ],
+            align = 'flex-start'
+            ),
     ],
-)
+    )
+
 
 """ ----------------------------------------------------------------------------
  Callback functions:
@@ -440,7 +315,7 @@ def update_map_title(variable, duration, geo_types, period_end):
 # Update variable list given variable_type selection
 # Either all variables, or a selected list of important key variables. 
 @app.callback(
-    Output("variable", "options"), 
+    Output("variable", "data"), 
     [
      Input("variable_type", "value"), 
      ]
@@ -457,7 +332,7 @@ def update_variable_entries(variable_type):
 
 # Update region dropdown options with either county or metro selections
 @app.callback(
-    Output("region_id", "options"), 
+    Output("region_id", "data"), 
     [
      Input("geo_types", "value"), 
      ]
@@ -697,8 +572,6 @@ def update_postcode_dropdown(
 
 
 # ----------------------------------------------------#
-
-app.css.append_css({"external_url": "https://codepen.io/chriddyp/pen/bWLwgP.css"})
 
 logging.info(f"Data Preparation completed in {time.time()-t0 :.1f} seconds")
 
