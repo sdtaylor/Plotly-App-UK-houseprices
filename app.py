@@ -23,12 +23,6 @@ from figures_utils import (
     price_volume_ts,
 )
 from utils import (
-    get_price_volume_df,
-    get_regional_data,
-    get_regional_geo_data,
-    get_regional_geo_sector,
-    get_schools_data,
-    
     get_geo_data,
     get_all_data_for_region_and_var,
     get_all_data_for_timeperiod_and_var,
@@ -60,9 +54,6 @@ logging.info(f"System: {sys.version}")
 
 colors = {"background": "#1F2630", "text": "#7FDBFF"}
 
-geo_levels = ['country','metro']
-
-
 NOTES = """
     **Notes:**
     1. Property type "Other" is filtered from the house price data.
@@ -90,22 +81,6 @@ t0 = time.time()
 """ ----------------------------------------------------------------------------
 Data Pre-processing
 ---------------------------------------------------------------------------- """
-# price_volume_df = get_price_volume_df()
-# regional_price_data = get_regional_data("sector_price")
-# regional_percentage_delta_data = get_regional_data("sector_percentage_delta")
-# regional_geo_data, regional_geo_data_paths = get_regional_geo_data()
-# regional_geo_sector = get_regional_geo_sector(regional_geo_data)
-# schools_top_500 = get_schools_data()
-
-# ---------------------------------------------
-
-# initial values:
-# initial_year = max(cfg["Years"])
-# initial_region = "Greater London"
-
-# sectors = regional_price_data[initial_year][initial_region]["Sector"].values
-# initial_sector = random.choice(sectors)
-# initial_geo_sector = [regional_geo_sector[initial_region][initial_sector]]
 
 empty_series = pd.DataFrame(np.full(len(cfg["Years"]), np.nan), index=cfg["Years"])
 empty_series.rename(columns={0: ""}, inplace=True)
