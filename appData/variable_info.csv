@@ -1,95 +1,95 @@
-variable,pretty_name,yoy_var,variable_type,variable_description
-active_listings,Active Listings,FALSE,count,The total number of listings of homes for sale that were active at any point during a given time period.
-active_listings_yoy,Active Listings YOY,TRUE,count,
-adjusted_average_homes_delisted,Adjusted Average Homes Delisted,FALSE,,
-adjusted_average_homes_delisted_yoy,Adjusted Average Homes Delisted YOY,TRUE,,
-adjusted_average_homes_sold,Adjusted Average Homes Sold,FALSE,,
-adjusted_average_homes_sold_yoy,Adjusted Average Homes Sold YOY,TRUE,,
-adjusted_average_new_listings,Adjusted Average New Listings,FALSE,,
-adjusted_average_new_listings_yoy,Adjusted Average New Listings YOY,TRUE,,
-adjusted_pending_sales,Adjusted Pending Sales,FALSE,,
-adjusted_pending_sales_yoy,Adjusted Pending Sales YOY,TRUE,,
-age_of_inventory,Age Of Inventory,FALSE,count,The typical (median) number of  days  that active listings of homes for sale  have been on the market during a given time period. 
-age_of_inventory_yoy,Age Of Inventory YOY,TRUE,count,The typical (median) number of  days  that active listings of homes for sale  have been on the market during a given time period. 
-average_adjustment_average_homes_delisted,Average Adjustment Average Homes Delisted,FALSE,,
-average_adjustment_average_homes_sold,Average Adjustment Average Homes Sold,FALSE,,
-average_adjustment_average_new_listings,Average Adjustment Average New Listings,FALSE,,
-average_adjustment_pending_sales,Average Adjustment Pending Sales,FALSE,,
-average_homes_sold,Average Homes Sold,FALSE,count,
-average_homes_sold_with_price_drops,Average Homes Sold With Price Drops,FALSE,count,
-average_homes_sold_with_price_drops_yoy,Average Homes Sold With Price Drops YOY,TRUE,count,
-average_homes_sold_yoy,Average Homes Sold YOY,TRUE,count,
-average_new_listings,Average New Listings,FALSE,count,
-average_new_listings_yoy,Average New Listings YOY,TRUE,count,
-average_of_median_list_price_amount,Average Of Median List Price Amount,FALSE,price,
-average_of_median_list_price_amount_yoy,Average Of Median List Price Amount YOY,TRUE,price,
-average_of_median_offer_price_amount,Average Of Median Offer Price Amount,FALSE,price,
-average_of_median_offer_price_amount_yoy,Average Of Median Offer Price Amount YOY,TRUE,price,
-average_pending_sales_listing_updates,Average Pending Sales Listing Updates,FALSE,count,
-average_pending_sales_listing_updates_yoy,Average Pending Sales Listing Updates YOY,TRUE,count,
-average_percent_off_market_in_one_week_listing_updates,Average Percent Off Market In One Week Listing Updates,FALSE,pct,
-average_percent_off_market_in_one_week_listing_updates_yoy,Average Percent Off Market In One Week Listing Updates YOY,TRUE,pct,
-average_percent_off_market_in_two_weeks_listing_updates,Average Percent Off Market In Two Weeks Listing Updates,FALSE,pct,
-average_percent_off_market_in_two_weeks_listing_updates_yoy,Average Percent Off Market In Two Weeks Listing Updates YOY,TRUE,pct,
-average_sale_to_list_ratio,Average Sale To List Ratio,FALSE,ratio,"A measurement of how close the typical home’s final sale price was  to its original list price. It’s calculated as an average of the ratio of each home sold during a given period  price divided by its list price. A sale-to-list price ratio of 99%, for instance, means a home sold for 1% under its list price. A sale-to-list price ratio of 101% means a home sold for 1% over its list price. This excludes properties with a sale price 50% or more above the listing price or 50% or more below the list price."
-average_sale_to_list_ratio_yoy,Average Sale To List Ratio YOY,TRUE,ratio,
-avg_offer_to_list,Avg Offer To List,FALSE,ratio,
-avg_offer_to_list_yoy,Avg Offer To List YOY,TRUE,ratio,
-homes_delisted,Homes Delisted,FALSE,,The total number of unsold home listings that were removed from the market during a given time period.
-homes_delisted_yoy,Homes Delisted YOY,TRUE,,
-inventory,Inventory,FALSE,,"The total number of active listings on the market on the last day of a given time period. Inventory differs from active listings in that active listings are a snapshot of homes a buyer could have seen throughout the month, while inventory measures how many homes will be available for sale at the start of the next month."
-inventory_yoy,Inventory YOY,TRUE,,
-median_active_list_ppsf,Median Active List Ppsf,FALSE,,
-median_active_list_ppsf_yoy,Median Active List Ppsf YOY,TRUE,,
-median_active_list_price,Median Active List Price,FALSE,price,
-median_active_list_price_yoy,Median Active List Price YOY,TRUE,price,
-median_days_on_market,Median Days On Market,FALSE,,"The median number of days homes that went under contract during a given period spent on the market before going under contract, meaning the seller accepted an offer from a buyer. Excludes homes that spent more than a year on the market before going under contract."
-median_days_on_market_yoy,Median Days On Market YOY,TRUE,,
-median_days_to_close,Median Days To Close,FALSE,,"The median number of days it took for a home sale to close after the home went under contract, meaning the seller accepted an offer from a buyer."
-median_days_to_close_yoy,Median Days To Close YOY,TRUE,,
-median_new_listing_ppsf,Median New Listing Ppsf,FALSE,,
-median_new_listing_ppsf_yoy,Median New Listing Ppsf YOY,TRUE,,
-median_new_listing_price,Median New Listing Price,FALSE,price,The median asking price of homes that were listed for sale during a given time period. 
-median_new_listing_price_yoy,Median New Listing Price YOY,TRUE,price,
-median_pending_sqft,Median Pending Sqft,FALSE,,
-median_pending_sqft_yoy,Median Pending Sqft YOY,TRUE,,
-median_sale_ppsf,Median Sale Ppsf,FALSE,,
-median_sale_ppsf_yoy,Median Sale Ppsf YOY,TRUE,,
-median_sale_price,Median Sale Price,FALSE,price,The median final sale price of homes that sold during a given time period.
-median_sale_price_yoy,Median Sale Price YOY,TRUE,price,
-months_of_supply,Months Of Supply,FALSE,,"The length of time it would take for the existing supply of homes for sale to be bought up at the market’s current pace of sales, assuming no new homes came on the market. This is calculated by dividing inventory by home sales. It’s typically used to measure the balance between supply and demand; higher supply indicates a buyer’s market, while lower supply indicates a seller’s market."
-months_of_supply_yoy,Months Of Supply YOY,TRUE,,
-off_market_in_one_week,Off Market In One Week,FALSE,,
-off_market_in_one_week_yoy,Off Market In One Week YOY,TRUE,,
-off_market_in_two_weeks,Off Market In Two Weeks,FALSE,,
-off_market_in_two_weeks_yoy,Off Market In Two Weeks YOY,TRUE,,
-pending_sales,Pending Sales,FALSE,,"The total number of homes that went under contract, meaning the seller accepted an offer from a buyer, during a given time period. Excludes homes that were on the market longer than 90 days."
-pending_sales_to_sales_ratio,Pending Sales To Sales Ratio,FALSE,,
-pending_sales_to_sales_ratio_yoy,Pending Sales To Sales Ratio YOY,TRUE,,
-pending_sales_yoy,Pending Sales YOY,TRUE,,
-percent_active_listings_delisted,Percent Active Listings Delisted,FALSE,pct,
-percent_active_listings_delisted_yoy,Percent Active Listings Delisted YOY,TRUE,pct,
-percent_active_listings_with_price_drops,Percent Active Listings With Price Drops,FALSE,pct,
-percent_active_listings_with_price_drops_yoy,Percent Active Listings With Price Drops YOY,TRUE,pct,
-percent_homes_sold_above_list,Percent Homes Sold Above List,FALSE,pct,The percentage of homes with a final sale price higher than its most recent list price.  Excludes properties with a sale price 50% above the list price or 50% below the list price.
-percent_homes_sold_above_list_yoy,Percent Homes Sold Above List YOY,TRUE,pct,
-percent_homes_sold_with_price_drops,Percent Homes Sold With Price Drops,FALSE,pct,"When a home seller reduces their listing price after the home is already on the market, that is considered a price drop. This metric is typically expressed as a percentage, i.e. “5% of homes for sale in March had a price drop.” Redfin’s monthly market tracker defines the share of homes with a price drop as the percentage of for-sale homes that dropped its price to one lower than the original asking price. Redfin’s weekly housing-market report defines the share of homes with a price drop as the average percentage of homes for sale each week of a four-week period that dropped its price to one lower than the original asking price"
-percent_homes_sold_with_price_drops_yoy,Percent Homes Sold With Price Drops YOY,TRUE,pct,
-percent_off_market_in_one_week,Percent Off Market In One Week,FALSE,pct,"The percentage of homes that went under contract, meaning the seller accepted an offer from a buyer, within one  week of its listing date."
-percent_off_market_in_one_week_yoy,Percent Off Market In One Week YOY,TRUE,pct,
-percent_off_market_in_two_weeks,Percent Off Market In Two Weeks,FALSE,pct,"The percentage of homes that went under contract, meaning the seller accepted an offer from a buyer, within two weeks of its listing date."
-percent_off_market_in_two_weeks_yoy,Percent Off Market In Two Weeks YOY,TRUE,pct,
-percent_total_price_drops_of_inventory,Percent Total Price Drops Of Inventory,FALSE,pct,
-percent_total_price_drops_of_inventory_yoy,Percent Total Price Drops Of Inventory YOY,TRUE,pct,
-price_drop_percent_of_old_list_price,Price Drop Percent Of Old List Price,FALSE,pct,
-price_drop_percent_of_old_list_price_yoy,Price Drop Percent Of Old List Price YOY,TRUE,pct,
-price_drops,Price Drops,FALSE,price,
-price_drops_yoy,Price Drops YOY,TRUE,price,
-total_active_listings,Total Active Listings,FALSE,count,
-total_active_listings_yoy,Total Active Listings YOY,TRUE,count,
-total_homes_sold,Total Homes Sold,FALSE,count,The total number of closed home sales.
-total_homes_sold_with_price_drops,Total Homes Sold With Price Drops,FALSE,price,
-total_homes_sold_with_price_drops_yoy,Total Homes Sold With Price Drops YOY,TRUE,price,
-total_homes_sold_yoy,Total Homes Sold YOY,TRUE,count,
-total_new_listings,Total New Listings,FALSE,count,The total number of homes listed for sale during a given time period.
-total_new_listings_yoy,Total New Listings YOY,TRUE,count,
+variable,pretty_name,yoy_var,key_var,variable_type,variable_description
+active_listings,Active Listings,FALSE,TRUE,count,The total number of listings of homes for sale that were active at any point during a given time period.
+active_listings_yoy,Active Listings YOY,TRUE,TRUE,count,
+adjusted_average_homes_delisted,Adjusted Average Homes Delisted,FALSE,FALSE,,
+adjusted_average_homes_delisted_yoy,Adjusted Average Homes Delisted YOY,TRUE,FALSE,,
+adjusted_average_homes_sold,Adjusted Average Homes Sold,FALSE,FALSE,,
+adjusted_average_homes_sold_yoy,Adjusted Average Homes Sold YOY,TRUE,FALSE,,
+adjusted_average_new_listings,Adjusted Average New Listings,FALSE,FALSE,,
+adjusted_average_new_listings_yoy,Adjusted Average New Listings YOY,TRUE,FALSE,,
+adjusted_pending_sales,Adjusted Pending Sales,FALSE,FALSE,,
+adjusted_pending_sales_yoy,Adjusted Pending Sales YOY,TRUE,FALSE,,
+age_of_inventory,Age Of Inventory,FALSE,FALSE,count,The typical (median) number of  days  that active listings of homes for sale  have been on the market during a given time period. 
+age_of_inventory_yoy,Age Of Inventory YOY,TRUE,FALSE,count,The typical (median) number of  days  that active listings of homes for sale  have been on the market during a given time period. 
+average_adjustment_average_homes_delisted,Average Adjustment Average Homes Delisted,FALSE,FALSE,,
+average_adjustment_average_homes_sold,Average Adjustment Average Homes Sold,FALSE,FALSE,,
+average_adjustment_average_new_listings,Average Adjustment Average New Listings,FALSE,FALSE,,
+average_adjustment_pending_sales,Average Adjustment Pending Sales,FALSE,FALSE,,
+average_homes_sold,Average Homes Sold,FALSE,TRUE,count,
+average_homes_sold_with_price_drops,Average Homes Sold With Price Drops,FALSE,FALSE,count,
+average_homes_sold_with_price_drops_yoy,Average Homes Sold With Price Drops YOY,TRUE,FALSE,count,
+average_homes_sold_yoy,Average Homes Sold YOY,TRUE,TRUE,count,
+average_new_listings,Average New Listings,FALSE,TRUE,count,
+average_new_listings_yoy,Average New Listings YOY,TRUE,TRUE,count,
+average_of_median_list_price_amount,Average Of Median List Price Amount,FALSE,FALSE,price,
+average_of_median_list_price_amount_yoy,Average Of Median List Price Amount YOY,TRUE,FALSE,price,
+average_of_median_offer_price_amount,Average Of Median Offer Price Amount,FALSE,FALSE,price,
+average_of_median_offer_price_amount_yoy,Average Of Median Offer Price Amount YOY,TRUE,FALSE,price,
+average_pending_sales_listing_updates,Average Pending Sales Listing Updates,FALSE,FALSE,count,
+average_pending_sales_listing_updates_yoy,Average Pending Sales Listing Updates YOY,TRUE,FALSE,count,
+average_percent_off_market_in_one_week_listing_updates,Average Percent Off Market In One Week Listing Updates,FALSE,FALSE,pct,
+average_percent_off_market_in_one_week_listing_updates_yoy,Average Percent Off Market In One Week Listing Updates YOY,TRUE,FALSE,pct,
+average_percent_off_market_in_two_weeks_listing_updates,Average Percent Off Market In Two Weeks Listing Updates,FALSE,FALSE,pct,
+average_percent_off_market_in_two_weeks_listing_updates_yoy,Average Percent Off Market In Two Weeks Listing Updates YOY,TRUE,FALSE,pct,
+average_sale_to_list_ratio,Average Sale To List Ratio,FALSE,FALSE,ratio,"A measurement of how close the typical home’s final sale price was  to its original list price. It’s calculated as an average of the ratio of each home sold during a given period  price divided by its list price. A sale-to-list price ratio of 99%, for instance, means a home sold for 1% under its list price. A sale-to-list price ratio of 101% means a home sold for 1% over its list price. This excludes properties with a sale price 50% or more above the listing price or 50% or more below the list price."
+average_sale_to_list_ratio_yoy,Average Sale To List Ratio YOY,TRUE,FALSE,ratio,
+avg_offer_to_list,Avg Offer To List,FALSE,FALSE,ratio,
+avg_offer_to_list_yoy,Avg Offer To List YOY,TRUE,FALSE,ratio,
+homes_delisted,Homes Delisted,FALSE,FALSE,,The total number of unsold home listings that were removed from the market during a given time period.
+homes_delisted_yoy,Homes Delisted YOY,TRUE,FALSE,,
+inventory,Inventory,FALSE,TRUE,,"The total number of active listings on the market on the last day of a given time period. Inventory differs from active listings in that active listings are a snapshot of homes a buyer could have seen throughout the month, while inventory measures how many homes will be available for sale at the start of the next month."
+inventory_yoy,Inventory YOY,TRUE,TRUE,,
+median_active_list_ppsf,Median Active List Ppsf,FALSE,TRUE,,
+median_active_list_ppsf_yoy,Median Active List Ppsf YOY,TRUE,TRUE,,
+median_active_list_price,Median Active List Price,FALSE,TRUE,price,
+median_active_list_price_yoy,Median Active List Price YOY,TRUE,TRUE,price,
+median_days_on_market,Median Days On Market,FALSE,TRUE,,"The median number of days homes that went under contract during a given period spent on the market before going under contract, meaning the seller accepted an offer from a buyer. Excludes homes that spent more than a year on the market before going under contract."
+median_days_on_market_yoy,Median Days On Market YOY,TRUE,TRUE,,
+median_days_to_close,Median Days To Close,FALSE,FALSE,,"The median number of days it took for a home sale to close after the home went under contract, meaning the seller accepted an offer from a buyer."
+median_days_to_close_yoy,Median Days To Close YOY,TRUE,FALSE,,
+median_new_listing_ppsf,Median New Listing Ppsf,FALSE,FALSE,,
+median_new_listing_ppsf_yoy,Median New Listing Ppsf YOY,TRUE,FALSE,,
+median_new_listing_price,Median New Listing Price,FALSE,FALSE,price,The median asking price of homes that were listed for sale during a given time period. 
+median_new_listing_price_yoy,Median New Listing Price YOY,TRUE,FALSE,price,
+median_pending_sqft,Median Pending Sqft,FALSE,FALSE,,
+median_pending_sqft_yoy,Median Pending Sqft YOY,TRUE,FALSE,,
+median_sale_ppsf,Median Sale Ppsf,FALSE,TRUE,,
+median_sale_ppsf_yoy,Median Sale Ppsf YOY,TRUE,TRUE,,
+median_sale_price,Median Sale Price,FALSE,TRUE,price,The median final sale price of homes that sold during a given time period.
+median_sale_price_yoy,Median Sale Price YOY,TRUE,TRUE,price,
+months_of_supply,Months Of Supply,FALSE,TRUE,,"The length of time it would take for the existing supply of homes for sale to be bought up at the market’s current pace of sales, assuming no new homes came on the market. This is calculated by dividing inventory by home sales. It’s typically used to measure the balance between supply and demand; higher supply indicates a buyer’s market, while lower supply indicates a seller’s market."
+months_of_supply_yoy,Months Of Supply YOY,TRUE,TRUE,,
+off_market_in_one_week,Off Market In One Week,FALSE,FALSE,,
+off_market_in_one_week_yoy,Off Market In One Week YOY,TRUE,FALSE,,
+off_market_in_two_weeks,Off Market In Two Weeks,FALSE,FALSE,,
+off_market_in_two_weeks_yoy,Off Market In Two Weeks YOY,TRUE,FALSE,,
+pending_sales,Pending Sales,FALSE,TRUE,,"The total number of homes that went under contract, meaning the seller accepted an offer from a buyer, during a given time period. Excludes homes that were on the market longer than 90 days."
+pending_sales_to_sales_ratio,Pending Sales To Sales Ratio,FALSE,FALSE,,
+pending_sales_to_sales_ratio_yoy,Pending Sales To Sales Ratio YOY,TRUE,FALSE,,
+pending_sales_yoy,Pending Sales YOY,TRUE,TRUE,,
+percent_active_listings_delisted,Percent Active Listings Delisted,FALSE,FALSE,pct,
+percent_active_listings_delisted_yoy,Percent Active Listings Delisted YOY,TRUE,FALSE,pct,
+percent_active_listings_with_price_drops,Percent Active Listings With Price Drops,FALSE,FALSE,pct,
+percent_active_listings_with_price_drops_yoy,Percent Active Listings With Price Drops YOY,TRUE,FALSE,pct,
+percent_homes_sold_above_list,Percent Homes Sold Above List,FALSE,FALSE,pct,The percentage of homes with a final sale price higher than its most recent list price.  Excludes properties with a sale price 50% above the list price or 50% below the list price.
+percent_homes_sold_above_list_yoy,Percent Homes Sold Above List YOY,TRUE,FALSE,pct,
+percent_homes_sold_with_price_drops,Percent Homes Sold With Price Drops,FALSE,FALSE,pct,"When a home seller reduces their listing price after the home is already on the market, that is considered a price drop. This metric is typically expressed as a percentage, i.e. “5% of homes for sale in March had a price drop.” Redfin’s monthly market tracker defines the share of homes with a price drop as the percentage of for-sale homes that dropped its price to one lower than the original asking price. Redfin’s weekly housing-market report defines the share of homes with a price drop as the average percentage of homes for sale each week of a four-week period that dropped its price to one lower than the original asking price"
+percent_homes_sold_with_price_drops_yoy,Percent Homes Sold With Price Drops YOY,TRUE,FALSE,pct,
+percent_off_market_in_one_week,Percent Off Market In One Week,FALSE,FALSE,pct,"The percentage of homes that went under contract, meaning the seller accepted an offer from a buyer, within one  week of its listing date."
+percent_off_market_in_one_week_yoy,Percent Off Market In One Week YOY,TRUE,FALSE,pct,
+percent_off_market_in_two_weeks,Percent Off Market In Two Weeks,FALSE,FALSE,pct,"The percentage of homes that went under contract, meaning the seller accepted an offer from a buyer, within two weeks of its listing date."
+percent_off_market_in_two_weeks_yoy,Percent Off Market In Two Weeks YOY,TRUE,FALSE,pct,
+percent_total_price_drops_of_inventory,Percent Total Price Drops Of Inventory,FALSE,FALSE,pct,
+percent_total_price_drops_of_inventory_yoy,Percent Total Price Drops Of Inventory YOY,TRUE,FALSE,pct,
+price_drop_percent_of_old_list_price,Price Drop Percent Of Old List Price,FALSE,FALSE,pct,
+price_drop_percent_of_old_list_price_yoy,Price Drop Percent Of Old List Price YOY,TRUE,FALSE,pct,
+price_drops,Price Drops,FALSE,TRUE,price,
+price_drops_yoy,Price Drops YOY,TRUE,TRUE,price,
+total_active_listings,Total Active Listings,FALSE,TRUE,count,
+total_active_listings_yoy,Total Active Listings YOY,TRUE,TRUE,count,
+total_homes_sold,Total Homes Sold,FALSE,TRUE,count,The total number of closed home sales.
+total_homes_sold_with_price_drops,Total Homes Sold With Price Drops,FALSE,FALSE,price,
+total_homes_sold_with_price_drops_yoy,Total Homes Sold With Price Drops YOY,TRUE,FALSE,price,
+total_homes_sold_yoy,Total Homes Sold YOY,TRUE,TRUE,count,
+total_new_listings,Total New Listings,FALSE,TRUE,count,The total number of homes listed for sale during a given time period.
+total_new_listings_yoy,Total New Listings YOY,TRUE,TRUE,count,

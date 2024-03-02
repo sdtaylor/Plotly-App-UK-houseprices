@@ -118,6 +118,8 @@ geo_data, geo_data_paths = get_geo_data()
 
 variable_info = get_variable_info().sort_values('variable')
 var_pretty_name_lut = {v.variable:v.pretty_name for v in  variable_info.itertuples()}
+key_variable_info = variable_info.query('key_var')
+assert initial_variable in key_variable_info.variable.tolist(), 'initial_variable must be a key variable'
 # a dictionary with {region_id:region_name,} for some things
 region_id_lut = get_all_region_info()
 # a data.frame with the same info for other things.
@@ -218,7 +220,7 @@ app.layout = html.Div(
                     [
                         dcc.Dropdown(
                             id="variable",
-                            options=[{"label": v.pretty_name, "value": v.variable} for v in variable_info.itertuples()],
+                            options=[initial_variable],
                             value=initial_variable,
                             clearable=False,
                             style={"color": "black"},
@@ -292,7 +294,26 @@ app.layout = html.Div(
                     },
                     className="two columns",
                 ),
-                
+                html.Div(
+                    [
+                        dbc.RadioItems(
+                            id="variable_type",
+                            options=[
+                                {'label':'Key Variables', 'value':'key_vars'},
+                                {'label':'All Variables', 'value':'all_vars'},
+                            ],
+                            value="key_vars",
+                            inline=True,
+                        )
+                    ],
+                    style={
+                        "display": "inline-block",
+                        "textAlign": "center",
+                        "padding": "5px 0px 10px 10px",
+                        "width": "20%",
+                    },
+                    className="two columns",
+                ),
                 
                 html.Div(
                     [
@@ -452,12 +473,29 @@ def update_map_title(variable, duration, geo_types, period_end):
     
     return f"{variable_text} for {geo_type_text}. Using a {duration} smoothing window and period ending {period_end_text}"
 
+# Update variable list given variable_type selection
+# Either all variables, or a selected list of important key variables. 
+@app.callback(
+    Output("variable", "options"), 
+    [
+     Input("variable_type", "value"), 
+     ]
+)
+def update_variable_entries(variable_type):
+    if variable_type == 'all_vars':
+        var_df = variable_info
+    elif variable_type == 'key_vars':
+        var_df = key_variable_info
+    else:
+        raise RuntimeError(f'unknown variable_type {variable_type}')
+    
+    return [{"label": v.pretty_name, "value": v.variable} for v in var_df.itertuples()]
+
 # Update region dropdown options with either county or metro selections
 @app.callback(
     Output("region_id", "options"), 
     [
      Input("geo_types", "value"), 
-     #Input("year", "value")
      ]
 )
 def update_region_entries(geo_types):
