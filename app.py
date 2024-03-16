@@ -42,26 +42,8 @@ logging.info(f"System: {sys.version}")
 """ ----------------------------------------------------------------------------
  App Settings
 ---------------------------------------------------------------------------- """
-# regions = [
-#     "Greater London",
-#     "South East",
-#     "South West",
-#     "Midlands",
-#     "North England",
-#     "Wales",
-#     "Counties",
-# ]
 
 colors = {"background": "#1F2630", "text": "#7FDBFF"}
-
-NOTES = """
-    **Notes:**
-    1. Duration represents the smoothing window used.
-    2. School ranking (2018-2019) is the best of GCSE and A-Level rankings.
-    3. GCSE ranking can be misleading - subjects like
-    Classics and Latin are excluded from scoring,
-    unfairly penalising some schools.
-"""
 
 t0 = time.time()
 
@@ -317,8 +299,9 @@ def update_map_title(variable, duration, geo_types, period_end):
     variable_text = var_pretty_name_lut.get(variable, '')
     
     period_end_text = period_end
+    duration_text = duration.replace('s','') # weeks to week
     
-    return f"{variable_text} for {geo_type_text}. Using a {duration} smoothing window and period ending {period_end_text}"
+    return f"{variable_text} for {geo_type_text}. Using a {duration_text} smoothing window and period ending {period_end_text}"
 
 # Update variable list given variable_type selection
 # Either all variables, or a selected list of important key variables. 
