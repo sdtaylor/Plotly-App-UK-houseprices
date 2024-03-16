@@ -118,13 +118,17 @@ cache = Cache(
 )
 app.config.suppress_callback_exceptions = True
 
+style = dict(
+    margin = '0px',
+    padding = '0px',
+    )
+
 # --------------------------------------------------------#
 # Individual components are defined here one by one.
 # They are inserted into the app below.
-title_text = html.H1(children="USA Real Estate Metrics")
-made_with_text = html.H6(children="Created with Dash")
-data_attibution_markdown = dcc.Markdown("Data provided by [Redfin](https://www.redfin.com/), a national real estate brokerage")
-
+title_text = html.H1(children="USA Real Estate Metrics", style=style)
+made_with_text = dcc.Markdown('Created with [Dash](https://dash.plotly.com). Inspired by [UK House Prices](https://github.com/ivanlai/Plotly-App-UK-houseprices)')
+data_attibution_markdown = dcc.Markdown("Data provided by [Redfin](https://www.redfin.com/), a national real estate brokerage", style=style)
 
 
 # Primary components
@@ -134,6 +138,7 @@ variable_dropdown = dmc.Select(
     #placeholder="Select one",
     value=initial_variable,
     data=[initial_variable],
+    style=style,
     #style={"width": 200, "marginBottom": 10},
 )
 
@@ -150,6 +155,7 @@ region_dropdown = dmc.MultiSelect(
     searchable=True,
     clearable=True,
     maxSelectedValues=max_selected_regions,
+    style=style,
     #style={"width": 400, "marginBottom": 10},
 )
 
@@ -159,6 +165,7 @@ duration_dropdown = dmc.Select(
     label="Smoothing Window",
     value=initial_duration,
     data=[{"label": v.replace('s',''), "value": v} for v in ['1 weeks','4 weeks','12 weeks']],
+    style=style,
     #style={"width": 200, "marginBottom": 10},
 )
 
@@ -171,6 +178,7 @@ geotype_checklist = dmc.CheckboxGroup(
         dmc.Checkbox(label="Metro Areas", value="metros", checked=True),
     ],
     value=["counties",'metros'],
+    style=style,
 )
 
 variable_type_radio = dmc.RadioGroup(
@@ -182,6 +190,7 @@ variable_type_radio = dmc.RadioGroup(
         dmc.Radio('All Variables', value='all_vars'),
         ],
     value="key_vars",
+    style=style,
 )
 
 
@@ -194,6 +203,7 @@ period_dropdown = dmc.Select(
         {"label": i, "value": i}
         for i in duration_period_end_dates[initial_duration]
     ],
+    style=style,
     #style={"width": 200, "marginBottom": 10},
 )
 
@@ -216,27 +226,24 @@ app.layout = dmc.MantineProvider(
             "h1": {"fontSize": 30},
         },
     },
+    'style' : {
+        'margin' : '0px',
+        'padding' : '0px',
+        }
     },
     children=[
         # Header
         dmc.Grid(
             children = [
                 dmc.Col(title_text, span='content'),
+                dmc.Col(data_attibution_markdown, span='content'),
                 dmc.Col(span='auto'), # empty col to push the made_with_text to the right side
                 dmc.Col(made_with_text, span='content'),
                 ],
             align = 'center',
             ),
         
-        
-        dmc.Grid(
-            children = [
-                dmc.Col(data_attibution_markdown, span='content')
-                ],
-            align = 'flex-start'
-            ),
-        
-        dmc.Space(h=50),
+        dmc.Space(h=10),
         
         # Selection components
         dmc.Grid(
@@ -251,14 +258,15 @@ app.layout = dmc.MantineProvider(
             align = 'flex-start'
             ),
         
-        dmc.Space(h=30),
+        dmc.Space(h=5),
         
         # Map title
         dmc.Grid(
             children = [
-                dmc.Col(html.H4(id="choropleth-title"), span='content')
+                dmc.Col(html.H4(id="choropleth-title"), span='content', style=style)
                 ],
-            align = 'flex-start'
+            align = 'flex-start',
+            style=style,
             ),
         
         # Map and timeseries chart
